@@ -1,6 +1,6 @@
 # Kitty - Plataforma de Adoção de Animais
 
-Kitty é uma plataforma web full-stack para adoção de gatos (e outros animais de estimação, como cães ou coelhos, mas com foco inicial em gatos). O objetivo principal é conectar adotantes com abrigos/ONGs, facilitando adoções responsáveis.
+Kitty é uma plataforma web full-stack para adoção de gatos (e outros animais de estimação, como cães ou coelhos, mas com foco inicial em gatos). O objetivo principal é conectar adotantes com abrigos/ONGs, facilitando adoções responsáveis. O design é "kawaii" com fundo branco, detalhes rosas e animações de gatinhos para criar uma experiência fofa e acolhedora.
 
 ## Funcionalidades
 
@@ -18,8 +18,8 @@ Kitty é uma plataforma web full-stack para adoção de gatos (e outros animais 
 - **Frontend e Full-Stack Framework**: Next.js 16 (App Router, React Server Components, Server Actions para forms e mutações)
 - **Biblioteca base**: React 19
 - **Tipagem**: TypeScript
-- **Estilização**: Tailwind CSS
-- **Componentes UI**: shadcn/ui (button, card, dialog, input, textarea, badge, avatar, skeleton, dropdown-menu, sheet, table, toast)
+- **Estilização**: Tailwind CSS com design kawaii
+- **Componentes UI**: shadcn/ui customizados (button, card, dialog, input, textarea, badge, avatar, skeleton, dropdown-menu, sheet, table, toast)
 - **Validação e Forms**: Zod + React Hook Form (@hookform/resolvers/zod)
 - **Fetching e Caching**: TanStack Query (React Query)
 - **Helpers**: clsx + tailwind-merge (cn function para classes)
@@ -28,6 +28,7 @@ Kitty é uma plataforma web full-stack para adoção de gatos (e outros animais 
 - **Banco de Dados**: PostgreSQL (via Supabase, relacional para tabelas como pets, adoption_requests, users)
 - **Storage**: Supabase Storage (upload e gerenciamento de fotos de pets)
 - **Realtime**: Supabase Realtime (subscriptions para updates em tempo real)
+- **Ícones**: Lucide React
 - **Deploy**: Vercel (1-click, edge runtime, integração nativa com Supabase)
 
 ## Estrutura de Pastas
@@ -129,33 +130,45 @@ npm run dev
 
 ## Funcionalidades Implementadas
 
+### Design Kawaii
+- **Paleta de cores rosa-laranja** para criar uma estética fofa e acolhedora
+- **Elementos decorativos** como gatinhos (🐱), patinhas (🐾) e corações (💕) em posições estratégicas
+- **Animações suaves** como bounce e float para elementos visuais
+- **Cards com design arredondado** e sombras suaves
+- **Botões com gradientes rosa-laranja** e efeitos hover
+- **Elementos de fundo** com padrões delicados e cores pastel
+
 ### Autenticação
 - Sistema de login e cadastro com Supabase Auth
 - Proteção de rotas baseada em papéis (roles)
 - Contexto de autenticação React
 
 ### Páginas
-- Página inicial com apresentação da plataforma
-- Página de login com validação
-- Página de cadastro com seleção de papel (adotante ou abrigo)
-- Dashboard para abrigos
-- Página de detalhes do pet
-- Página de configurações
-- Página para anunciar novo pet
+- **Página inicial**: Design kawaii com gradiente rosa, botões com efeitos hover e elementos decorativos de gatinhos
+- **Página de login**: Estilo kawaii com gradiente rosa-laranja nos botões, elementos decorativos e design consistente com a identidade visual
+- **Página de cadastro**: Estilo kawaii com gradiente rosa-laranja nos botões, elementos decorativos e design consistente com a identidade visual
+- **Layout de autenticação**: Atualizado para combinar com as cores kawaii do projeto (rosa e laranja)
+- **Dashboard para abrigos**: Design colorido com cards kawaii e ícones representativos
+- **Página de detalhes do pet**: Layout organizado com destaque para o animal e botões com estilo kawaii
+- **Página de configurações**: Interface amigável com elementos kawaii
+- **Página para anunciar novo pet**: Formulário com design kawaii e elementos visuais fofos
 
 ### Componentes UI
 - Componentes reutilizáveis seguindo os padrões shadcn/ui
 - Design responsivo com Tailwind CSS
 - Tipagem forte com TypeScript
+- Estilos kawaii aplicados a botões, cards, inputs e outros elementos
 
-## Próximos Passos
+## O que Falta Implementar
 
-- Implementar o sistema completo de upload de fotos
-- Desenvolver o formulário de solicitação de adoção
-- Criar o sistema de gerenciamento de pets no dashboard
-- Implementar notificações em tempo real
-- Adicionar recursos de busca e filtros avançados
-- Implementar sistema de avaliações e feedback
+- **Sistema completo de upload de fotos**: Integração com Supabase Storage para upload de múltiplas fotos de pets
+- **Formulário de solicitação de adoção**: Desenvolvimento do formulário completo com validações
+- **Sistema de gerenciamento de pets no dashboard**: CRUD completo para gerenciamento de animais
+- **Notificações em tempo real**: Implementação de sistema de notificações usando Supabase Realtime
+- **Recursos de busca e filtros avançados**: Sistema completo de filtragem de pets
+- **Sistema de avaliações e feedback**: Sistema para avaliações de adoções
+- **Integração com mapas**: Visualização de localização de abrigos
+- **Sistema de mensagens**: Comunicação entre adotantes e abrigos
 
 ## Contribuição
 
