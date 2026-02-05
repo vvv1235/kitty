@@ -9,6 +9,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { useAuth } from "@/lib/auth/provider"
 import { useRouter } from 'next/navigation'
+import { Cat, User, Mail, Lock, Heart } from "lucide-react"
 
 export default function Signup() {
   const [name, setName] = useState('')
@@ -34,61 +35,110 @@ export default function Signup() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Cadastro no Kitty</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50 p-4">
+      <div className="kitten-corner tl">🐱</div>
+      <div className="kitten-corner tr">🐾</div>
+      <div className="kitten-corner bl">💕</div>
+      <div className="kitten-corner br">🐾</div>
+      
+      <div className="absolute top-4 left-4">
+        <Link href="/" className="flex items-center text-pink-600 hover:text-pink-800">
+          <Cat className="h-5 w-5 mr-2" />
+          <span className="font-bold">Kitty</span>
+        </Link>
+      </div>
+      
+      <Card className="w-full max-w-md p-6 card-kawaii relative">
+        <CardHeader className="text-center pb-4">
+          <div className="flex justify-center mb-2">
+            <div className="bg-pink-100 rounded-full p-3 inline-block animate-bounce">
+              <Cat className="h-8 w-8 text-pink-500" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl font-bold text-pink-600">Cadastro no Kitty</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center text-sm text-gray-600 mb-1">
+                <User className="h-4 w-4 mr-1 text-pink-400" />
                 <Label htmlFor="name">Nome</Label>
-                <Input 
-                  id="name" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required 
-                />
               </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
-                />
-              </div>
-              <div>
-                <Label htmlFor="password">Senha</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required 
-                />
-              </div>
-              <div>
-                <Label htmlFor="role">Tipo de usuário</Label>
-                <Select value={role} onValueChange={(value: 'adopter' | 'shelter') => setRole(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="adopter">Adotante</SelectItem>
-                    <SelectItem value="shelter">Abrigo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Criando conta...' : 'Cadastrar'}
-              </Button>
+              <Input 
+                id="name" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required 
+                className="input-kawaii"
+              />
             </div>
+            <div className="space-y-2">
+              <div className="flex items-center text-sm text-gray-600 mb-1">
+                <Mail className="h-4 w-4 mr-1 text-pink-400" />
+                <Label htmlFor="email">Email</Label>
+              </div>
+              <Input 
+                id="email" 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+                className="input-kawaii"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center text-sm text-gray-600 mb-1">
+                <Lock className="h-4 w-4 mr-1 text-pink-400" />
+                <Label htmlFor="password">Senha</Label>
+              </div>
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+                className="input-kawaii"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center text-sm text-gray-600 mb-1">
+                <Heart className="h-4 w-4 mr-1 text-pink-400" />
+                <Label htmlFor="role">Tipo de usuário</Label>
+              </div>
+              <Select value={role} onValueChange={(value: 'adopter' | 'shelter') => setRole(value)}>
+                <SelectTrigger className="input-kawaii">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="adopter">Adotante</SelectItem>
+                  <SelectItem value="shelter">Abrigo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white px-4 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300" 
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Criando conta...
+                </div>
+              ) : (
+                <div className="flex items-center justify-center">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Cadastrar
+                </div>
+              )}
+            </Button>
           </form>
-          <p className="mt-4 text-center text-sm">Já tem conta? <Link href="/login" className="text-blue-500">Entre</Link></p>
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Já tem conta?{' '}
+            <Link href="/login" className="text-pink-500 hover:text-pink-700 font-medium underline">
+              Entre
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

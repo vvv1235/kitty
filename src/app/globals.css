@@ -44,6 +44,12 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  
+  /* Cores kawaii para o tema */
+  --kawaii-pink: #ffafbd;
+  --kawaii-light-pink: #ffc3a0;
+  --kawaii-white: #fffef7;
+  --kawaii-soft-pink: #ffeef0;
 }
 
 :root {
@@ -54,18 +60,18 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.6 0.15 20); /* Rosa quente */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.95 0.05 20); /* Rosa claro */
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.95 0.05 20); /* Rosa claro */
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.6 0.15 20); /* Rosa quente */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -121,5 +127,131 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(at 15% 25%, var(--kawaii-soft-pink) 0px, transparent 50%), radial-gradient(at 85% 25%, var(--kawaii-soft-pink) 0px, transparent 50%), radial-gradient(at 15% 75%, var(--kawaii-soft-pink) 0px, transparent 50%), radial-gradient(at 85% 75%, var(--kawaii-soft-pink) 0px, transparent 50%);
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
+}
+
+/* Animações kawaii */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.05); }
+}
+
+/* Elementos decorativos kawaii */
+body::before {
+  content: "🐱";
+  position: fixed;
+  top: 5%;
+  left: 5%;
+  font-size: 1.2rem;
+  opacity: 0.3;
+  z-index: -1;
+  animation: float 8s infinite ease-in-out;
+}
+
+body::after {
+  content: "🐾";
+  position: fixed;
+  bottom: 10%;
+  right: 7%;
+  font-size: 1rem;
+  opacity: 0.4;
+  z-index: -1;
+  animation: bounce 6s infinite ease-in-out;
+}
+
+/* Estilo kawaii para botões */
+.btn-kawaii {
+  background: linear-gradient(135deg, var(--kawaii-pink), var(--kawaii-light-pink));
+  border: 2px solid var(--kawaii-pink);
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 4px 8px rgba(255, 175, 189, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-kawaii:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(255, 175, 189, 0.4);
+  background: linear-gradient(135deg, var(--kawaii-light-pink), var(--kawaii-pink));
+}
+
+/* Estilo kawaii para cards */
+.card-kawaii {
+  background: white;
+  border: 2px solid var(--kawaii-soft-pink);
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(255, 175, 189, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-kawaii::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,175,189,0.1) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.card-kawaii > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card-kawaii:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(255, 175, 189, 0.3);
+}
+
+/* Elementos decorativos de gatinhos nos cards */
+.kitten-corner {
+  position: absolute;
+  font-size: 1.5rem;
+  opacity: 0.1;
+  z-index: 0;
+}
+
+.kitten-corner.tl { top: 5px; left: 5px; }
+.kitten-corner.tr { top: 5px; right: 5px; }
+.kitten-corner.bl { bottom: 5px; left: 5px; }
+.kitten-corner.br { bottom: 5px; right: 5px; }
+
+/* Animação para inputs */
+.input-kawaii {
+  border: 2px solid var(--kawaii-soft-pink);
+  border-radius: 12px;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+}
+
+.input-kawaii:focus {
+  border-color: var(--kawaii-pink);
+  box-shadow: 0 0 0 3px rgba(255, 175, 189, 0.2);
+  outline: none;
+}
+
+/* Animação para elementos quando aparecem */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
