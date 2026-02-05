@@ -23,10 +23,12 @@ export default function Login() {
     
     try {
       await signIn(email, password)
-      router.push('/dashboard') // Redirect to dashboard after login
+      // Esperar um pouco para garantir que o estado do usuário esteja atualizado
+      setTimeout(() => {
+        router.push('/') // Redirecionar para a página inicial após login
+      }, 500)
     } catch (error: any) {
       alert(error.message || 'Erro ao fazer login')
-    } finally {
       setLoading(false)
     }
   }

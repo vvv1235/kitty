@@ -33,9 +33,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          const userData = await getUserData(session?.user.id);
-          if (userData) {
-            setUser(userData);
+          if (session?.user?.id) {
+            const userData = await getUserData(session.user.id);
+            if (userData) {
+              setUser(userData);
+            }
           }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
@@ -70,7 +72,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     if (error) {
-      console.error('Error fetching user data:', error);
+      // Se o usuário não for encontrado, ele pode ser um usuário recém-criado
+      // Vamos tentar buscar os dados básicos do auth e criar o perfil automaticamente
+      if (error.code === 'PGRST116') { // Record not found
+        console.warn('User profile not found in public.users, attempting to create...');
+        
+        // Buscar dados do usuário no auth
+        const { data: authUser, error: authError } = await supabase.auth.getUser();
+        if (!authError && authUser.user) {
+          const userEmail = authUser.user.email;
+          
+          // Criar perfil de usuário com role padrão 'adopter'
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert([
+              {
+                id: userId,
+                email: userEmail || '',
+                role: 'adopter',
+                created_at: new Date().toISOString()
+              }
+            ]);
+            
+          if (insertError) {
+            console.error('Error creating user profile:', insertError);
+            return null;
+          }
+          
+          // Agora buscar novamente os dados recém-criados
+          const { data: newData, error: newError } = await supabase
+            .from('users')
+            .select('id, email, role, created_at')
+            .eq('id', userId)
+            .single();
+            
+          if (newError) {
+            console.error('Error fetching user data after creation:', newError);
+            return null;
+          }
+          
+          return newData as User;
+        }
+      } else {
+        console.error('Error fetching user data:', error);
+      }
       return null;
     }
 
@@ -93,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
 
-    // Create user profile in the database
+    // Create user profile in the database if it doesn't exist
     if (data.user) {
       const { error: profileError } = await supabase
         .from('users')
@@ -104,9 +149,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role,
             created_at: new Date().toISOString()
           }
-        ]);
+        ])
+        .select()
+        .single(); // Use .select().single() to avoid errors if user already exists
 
-      if (profileError) {
+      if (profileError && profileError.code !== '23505') { // 23505 is unique violation
         console.error('Error creating user profile:', profileError);
       }
     }
@@ -124,6 +171,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
 
+    // Aguardar um pouco para garantir que o estado esteja atualizado
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     const userData = await getUserData(data.user.id);
     if (userData) {
       setUser(userData);

@@ -39,7 +39,7 @@ export default function ProtectedRoute({
   }
 
   // Check role requirements
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredRole && user?.role !== requiredRole) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Acesso negado. Permissões insuficientes.</div>

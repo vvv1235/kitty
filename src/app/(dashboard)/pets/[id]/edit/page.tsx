@@ -1,22 +1,25 @@
 'use client'
 
-import { useState } from 'react';
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CreatePetInput } from '@/types/pet';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Pet, UpdatePetInput } from '@/types/pet';
 import { useAuth } from '@/lib/auth/provider';
-import { Cat, PawPrint, Calendar, Users, Heart, MapPin, Upload, Save, X } from "lucide-react"
+import { useRouter } from 'next/navigation';
+import { Cat, Dog, Heart, MapPin, Calendar, Users, Save, X, Upload } from 'lucide-react';
 import { petService } from '@/services/petService';
 
-export default function AnnouncePet() {
+export default function EditPet({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { user } = useAuth();
-  const [formData, setFormData] = useState<CreatePetInput>({
+  const [pet, setPet] = useState<Pet | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState<UpdatePetInput>({
     name: '',
     species: 'cat',
     breed: '',
@@ -30,10 +33,46 @@ export default function AnnouncePet() {
     sterilized: false,
     location: '',
   });
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<'available' | 'reserved' | 'adopted'>('available');
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [newPhotos, setNewPhotos] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchPet() {
+      try {
+        const petData = await petService.getPetById(params.id);
+        if (petData) {
+          setPet(petData);
+          setFormData({
+            name: petData.name,
+            species: petData.species,
+            breed: petData.breed,
+            age: petData.age,
+            size: petData.size,
+            gender: petData.gender,
+            color: petData.color,
+            description: petData.description,
+            vaccinated: petData.vaccinated,
+            dewormed: petData.dewormed,
+            sterilized: petData.sterilized,
+            location: petData.location,
+          });
+          setStatus(petData.status);
+          setPhotos(petData.photos || []);
+        } else {
+          setError('Pet não encontrado');
+        }
+      } catch (err) {
+        console.error('Error fetching pet:', err);
+        setError('Falha ao carregar o pet. Por favor, tente novamente.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPet();
+  }, [params.id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -45,73 +84,130 @@ export default function AnnouncePet() {
     }));
   };
 
-  const handleSelectChange = (name: keyof CreatePetInput, value: string) => {
+  const handleSelectChange = (name: keyof UpdatePetInput, value: string) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
+  const handleStatusChange = (value: 'available' | 'reserved' | 'adopted') => {
+    setStatus(value);
+  };
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      setPhotos(prev => [...prev, ...filesArray]);
+      setNewPhotos(prev => [...prev, ...filesArray]);
       
-      // Criar pré-visualizações das imagens
+      // Pré-visualização das imagens
       const newPreviewUrls = filesArray.map(file => URL.createObjectURL(file));
-      setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+      setPhotos(prev => [...prev, ...newPreviewUrls]);
     }
   };
 
   const removePhoto = (index: number) => {
-    // Remover a pré-visualização
-    const newPreviewUrls = [...previewUrls];
-    newPreviewUrls.splice(index, 1);
-    setPreviewUrls(newPreviewUrls);
+    // Remover pré-visualização
+    const newPhotosArray = [...photos];
+    newPhotosArray.splice(index, 1);
+    setPhotos(newPhotosArray);
     
-    // Revogar a URL de objeto para liberar memória
-    URL.revokeObjectURL(previewUrls[index]);
-    
-    // Remover o arquivo do array
-    const newPhotos = [...photos];
-    newPhotos.splice(index, 1);
-    setPhotos(newPhotos);
+    // Se for uma imagem nova, remover do array de novas imagens
+    if (index >= (photos.length - newPhotos.length) && index < photos.length) {
+      const newNewPhotos = [...newPhotos];
+      newNewPhotos.splice(index - (photos.length - newPhotos.length), 1);
+      setNewPhotos(newNewPhotos);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError(null);
-    
-    if (!user) {
-      setError('Você precisa estar logado para anunciar um pet');
-      setSaving(false);
-      return;
-    }
     
     try {
-      // Primeiro criar o pet
-      const newPet = await petService.createPet(formData, user.id);
+      // Atualizar os dados do pet
+      const updatedPet = await petService.updatePet(params.id, { ...formData, status });
       
-      // Se houver fotos para upload, fazer o upload
-      if (photos.length > 0) {
-        const uploadedUrls = await petService.uploadPetPhotos(photos, newPet.id);
+      // Se houver novas fotos para upload
+      if (newPhotos.length > 0 && user?.id) {
+        // Fazer upload das novas fotos
+        const uploadedUrls = await petService.uploadPetPhotos(newPhotos, params.id);
         
-        // Atualizar o pet com as URLs das fotos
-        await petService.updatePet(newPet.id, { 
-          photos: uploadedUrls 
+        // Atualizar novamente com as novas URLs de fotos
+        await petService.updatePet(params.id, { 
+          ...formData, 
+          status,
+          photos: [...(updatedPet.photos || []), ...uploadedUrls]
         });
       }
       
-      alert('Pet anunciado com sucesso!');
+      alert('Pet atualizado com sucesso!');
       router.push('/dashboard/pets'); // Redireciona para a lista de pets
     } catch (err) {
-      console.error('Error creating pet:', err);
-      setError('Falha ao anunciar o pet. Por favor, tente novamente.');
+      console.error('Error updating pet:', err);
+      alert('Falha ao atualizar o pet. Por favor, tente novamente.');
     } finally {
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-orange-50 p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((item) => (
+                <div key={item} className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-orange-50 p-4 md:p-8 flex items-center justify-center">
+        <Card className="card-kawaii text-center p-8">
+          <CardContent>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Erro ao carregar pet</h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button 
+              onClick={() => router.back()}
+              className="bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white"
+            >
+              Voltar
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!pet) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-orange-50 p-4 md:p-8 flex items-center justify-center">
+        <Card className="card-kawaii text-center p-8">
+          <CardContent>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Pet não encontrado</h3>
+            <p className="text-gray-600 mb-4">O pet que você está tentando editar não existe ou você não tem permissão para editá-lo.</p>
+            <Button 
+              onClick={() => router.push('/dashboard/pets')}
+              className="bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white"
+            >
+              Voltar para Meus Pets
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-orange-50 p-4 md:p-8">
@@ -120,14 +216,8 @@ export default function AnnouncePet() {
           <div className="bg-pink-100 rounded-full p-3 mr-4">
             <Cat className="h-6 w-6 text-pink-500" />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-pink-600">Anunciar Novo Pet</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-pink-600">Editar Pet</h1>
         </div>
-        
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            {error}
-          </div>
-        )}
         
         <Card className="card-kawaii">
           <CardHeader>
@@ -138,7 +228,7 @@ export default function AnnouncePet() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="flex items-center">
-                    <PawPrint className="h-4 w-4 mr-2 text-pink-400" />
+                    <Cat className="h-4 w-4 mr-2 text-pink-400" />
                     Nome
                   </Label>
                   <Input 
@@ -147,7 +237,6 @@ export default function AnnouncePet() {
                     value={formData.name} 
                     onChange={handleChange} 
                     className="input-kawaii" 
-                    placeholder="Ex: Fluffy"
                     required 
                   />
                 </div>
@@ -158,7 +247,7 @@ export default function AnnouncePet() {
                     Espécie
                   </Label>
                   <Select 
-                    value={formData.species} 
+                    value={formData.species || 'cat'} 
                     onValueChange={(value: 'cat' | 'dog' | 'other') => handleSelectChange('species', value)}
                   >
                     <SelectTrigger className="input-kawaii">
@@ -177,10 +266,9 @@ export default function AnnouncePet() {
                   <Input 
                     id="breed" 
                     name="breed" 
-                    value={formData.breed} 
+                    value={formData.breed || ''} 
                     onChange={handleChange} 
                     className="input-kawaii" 
-                    placeholder="Ex: Vira-lata"
                   />
                 </div>
                 
@@ -196,7 +284,6 @@ export default function AnnouncePet() {
                     value={formData.age} 
                     onChange={handleChange} 
                     className="input-kawaii" 
-                    placeholder="Ex: 12"
                     min="0"
                     required 
                   />
@@ -205,7 +292,7 @@ export default function AnnouncePet() {
                 <div className="space-y-2">
                   <Label htmlFor="size">Porte</Label>
                   <Select 
-                    value={formData.size} 
+                    value={formData.size || 'small'} 
                     onValueChange={(value: 'small' | 'medium' | 'large') => handleSelectChange('size', value)}
                   >
                     <SelectTrigger className="input-kawaii">
@@ -222,7 +309,7 @@ export default function AnnouncePet() {
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gênero</Label>
                   <Select 
-                    value={formData.gender} 
+                    value={formData.gender || 'male'} 
                     onValueChange={(value: 'male' | 'female') => handleSelectChange('gender', value)}
                   >
                     <SelectTrigger className="input-kawaii">
@@ -240,10 +327,9 @@ export default function AnnouncePet() {
                   <Input 
                     id="color" 
                     name="color" 
-                    value={formData.color} 
+                    value={formData.color || ''} 
                     onChange={handleChange} 
                     className="input-kawaii" 
-                    placeholder="Ex: Tricolor"
                   />
                 </div>
                 
@@ -255,12 +341,28 @@ export default function AnnouncePet() {
                   <Input 
                     id="location" 
                     name="location" 
-                    value={formData.location} 
+                    value={formData.location || ''} 
                     onChange={handleChange} 
                     className="input-kawaii" 
-                    placeholder="Ex: Manaus, AM"
                     required 
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select 
+                    value={status} 
+                    onValueChange={handleStatusChange as (value: string) => void}
+                  >
+                    <SelectTrigger className="input-kawaii">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="available">Disponível</SelectItem>
+                      <SelectItem value="reserved">Reservado</SelectItem>
+                      <SelectItem value="adopted">Adotado</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">
@@ -314,10 +416,9 @@ export default function AnnouncePet() {
                 <Textarea 
                   id="description" 
                   name="description" 
-                  value={formData.description} 
+                  value={formData.description || ''} 
                   onChange={handleChange} 
                   className="input-kawaii" 
-                  placeholder="Descreva o pet, sua personalidade, hábitos, etc..."
                   rows={4}
                   required 
                 />
@@ -346,15 +447,15 @@ export default function AnnouncePet() {
                   </label>
                 </div>
                 
-                {previewUrls.length > 0 && (
+                {photos.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Fotos selecionadas:</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Fotos carregadas:</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {previewUrls.map((previewUrl, index) => (
+                      {photos.map((photo, index) => (
                         <div key={index} className="relative group">
                           <img 
-                            src={previewUrl} 
-                            alt={`Pré-visualização ${index + 1}`} 
+                            src={photo} 
+                            alt={`Foto ${index + 1}`} 
                             className="w-full h-32 object-cover rounded-lg"
                           />
                           <button
@@ -389,12 +490,12 @@ export default function AnnouncePet() {
                   {saving ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Anunciando...
+                      Salvando...
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4 mr-2" />
-                      Anunciar Pet
+                      Salvar Alterações
                     </>
                   )}
                 </Button>
@@ -404,5 +505,5 @@ export default function AnnouncePet() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

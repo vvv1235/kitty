@@ -10,11 +10,13 @@ export const createClient = () => {
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll();
+          // @ts-ignore - workaround for type issue
+          return cookieStore.getAll ? cookieStore.getAll() : [];
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
+              // @ts-ignore - workaround for type issue
               cookieStore.set(name, value, options)
             );
           } catch (error) {

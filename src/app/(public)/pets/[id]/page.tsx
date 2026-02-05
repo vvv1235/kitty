@@ -1,8 +1,10 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth/provider"
 import { useRouter } from 'next/navigation'
-import { Heart, MapPin, Calendar, Users, Vaccine, Scissors, Home, Star } from "lucide-react"
+import { Heart, MapPin, Calendar, Users, Syringe, Scissors, Home, Star } from "lucide-react"
 
 export default function PetDetail({ params }: { params: { id: string } }) {
   const { user } = useAuth()
@@ -91,7 +93,7 @@ export default function PetDetail({ params }: { params: { id: string } }) {
                     <span className="ml-2">Manaus, AM</span>
                   </div>
                   <div className="flex items-center">
-                    <Vaccine className="h-4 w-4 text-pink-400 mr-2" />
+                    <Syringe className="h-4 w-4 text-pink-400 mr-2" />
                     <span className="font-semibold">Vacinado:</span> 
                     <span className="ml-2">Sim</span>
                   </div>

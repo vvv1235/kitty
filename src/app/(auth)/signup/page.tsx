@@ -26,10 +26,14 @@ export default function Signup() {
     
     try {
       await signUp(email, password, name, role)
-      router.push('/dashboard') // Redirect to dashboard after signup
+      // Esperar um pouco para garantir que o usuário foi criado no banco de dados
+      setTimeout(() => {
+        // Redirecionar para a página inicial em vez do dashboard
+        // O dashboard só deve ser acessado por usuários com role 'shelter'
+        router.push('/') // Redirecionar para a página inicial após o cadastro
+      }, 1000)
     } catch (error: any) {
       alert(error.message || 'Erro ao criar conta')
-    } finally {
       setLoading(false)
     }
   }
