@@ -19,14 +19,16 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (loading) return; // Prevenir múltiplos cliques
+    
     setLoading(true)
     
     try {
       await signIn(email, password)
       // Esperar um pouco para garantir que o estado do usuário esteja atualizado
-      setTimeout(() => {
-        router.push('/') // Redirecionar para a página inicial após login
-      }, 500)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Redirecionar para a página de pets após login
+      router.push('/pets')
     } catch (error: any) {
       alert(error.message || 'Erro ao fazer login')
       setLoading(false)
@@ -41,9 +43,8 @@ export default function Login() {
       <div className="kitten-corner br">🐾</div>
       
       <div className="absolute top-4 left-4">
-        <Link href="/" className="flex items-center text-pink-600 hover:text-pink-800">
-          <Cat className="h-5 w-5 mr-2" />
-          <span className="font-bold">Kitty</span>
+        <Link href="/" className="text-pink-600 hover:text-pink-800 font-bold text-lg">
+          Kitty
         </Link>
       </div>
       

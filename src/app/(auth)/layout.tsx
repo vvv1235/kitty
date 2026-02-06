@@ -12,10 +12,10 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-center">
-          <Link href="/" className="flex items-center text-xl font-bold text-pink-600">
+          <div className="flex items-center text-xl font-bold text-pink-600 select-none cursor-default">
             <Cat className="h-6 w-6 mr-2" />
-            Kitty Adoption
-          </Link>
+            Kitty 
+          </div>
         </div>
       </header>
 

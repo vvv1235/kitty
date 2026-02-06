@@ -142,7 +142,7 @@ export default function EditPet({ params }: { params: { id: string } }) {
       }
       
       alert('Pet atualizado com sucesso!');
-      router.push('/dashboard/pets'); // Redireciona para a lista de pets
+      router.push('/dashboard/my-pets');
     } catch (err) {
       console.error('Error updating pet:', err);
       alert('Falha ao atualizar o pet. Por favor, tente novamente.');
@@ -476,7 +476,7 @@ export default function EditPet({ params }: { params: { id: string } }) {
                 <Button 
                   type="button" 
                   variant="outline"
-                  onClick={() => router.push('/dashboard/pets')}
+                  onClick={() => router.push('/dashboard/my-pets')}
                   className="border-pink-200 text-pink-600 hover:bg-pink-50"
                   disabled={saving}
                 >

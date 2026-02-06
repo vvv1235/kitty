@@ -4,7 +4,7 @@ Kitty é uma plataforma web full-stack para adoção de gatos (e outros animais 
 
 ## Status do Projeto
 
-**Status Geral: 95% Completo**
+**Status Geral: 85% Completo**
 
 ## Funcionalidades
 
@@ -47,15 +47,13 @@ src/
 │   ├── (dashboard)/
 │   │   ├── settings/
 │   │   ├── announce-pet/
-│   │   ├── my-pets/          # Renomeado de pets/
-│   │   ├── requests/
 │   │   ├── page.tsx
 │   │   └── layout.tsx
+│   ├── (dashboard)/pets
+│   │   ├── page.tsx
+│   │   └── [id]/edit/page.tsx
 │   ├── (public)/
 │   │   ├── pets/[id]/
-│   │   ├── addpet/           # Nova página pública
-│   │   ├── shelters/         # Nova página pública
-│   │   ├── account-settings/ # Nova página pública
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── logout/
@@ -69,8 +67,7 @@ src/
 │   └── utils.ts
 ├── types/
 └── services/
-    ├── petService.ts
-    └── adoptionService.ts
+    └── petService.ts
 ```
 
 ## Dependências Necessárias
@@ -139,7 +136,7 @@ npm run dev
 ```
 5. Acesse http://localhost:3000 no seu navegador
 
-## Funcionalidades Implementadas (95% completo)
+## Funcionalidades Implementadas (85% completo)
 
 ### Arquitetura & Infraestrutura (100% completo)
 - Stack Tecnológica: Next.js 16 (App Router), TypeScript, Tailwind CSS, Supabase
@@ -149,35 +146,25 @@ npm run dev
 - Storage: Configurado para upload de fotos no Supabase Storage
 - Deployment: Configurado para Vercel (edge runtime, integração nativa com Supabase)
 
-### Autenticação & Autorização (100% completo)
+### Autenticação & Autorização (95% completo)
 - Sistema de Login/Signup: Completo e funcional
 - Controle de Roles: adopter, shelter, admin (com proteção adequada)
 - Proteção de Rotas: Baseada em papéis de usuário
 - Contexto de Autenticação: React Context implementado e otimizado
 - Integração Supabase Auth: Com tratamento de erros e recuperação automática
 - Políticas RLS: Configuradas para segurança de dados
-- Correção de loop infinito no login/cadastro
-- Redirecionamento pós-login para página de pets
 
 ### CRUD Completo de Pets (100% completo)
 - Criar Pet: Página `/dashboard/announce-pet` com formulário completo
-- Ler/Listar Pets: Página `/dashboard/my-pets` com listagem completa
-- Atualizar Pet: Página `/dashboard/my-pets/[id]/edit` com edição completa
+- Ler/Listar Pets: Página `/dashboard/pets` com listagem completa
+- Atualizar Pet: Página `/dashboard/pets/[id]/edit` com edição completa
 - Deletar Pet: Com confirmação e tratamento de erro
 - Upload de Fotos: Com pré-visualização e upload real para Supabase Storage
 - Controle de Status: disponível, reservado, adotado (com interface visual)
 - Validações: Formulário completo com Zod + React Hook Form
 - Feedback Visual: Toasts e mensagens de sucesso/erro
 
-### Sistema de Adoção (100% completo)
-- **Formulário de Solicitação**: Modal integrado à página de detalhes do pet
-- **Backend Completo**: Serviço `adoptionService.ts` com CRUD completo
-- **Dashboard de Solicitações**: Página `/dashboard/requests` para gerenciamento
-- **Aprovação/Rejeição**: Interface completa para abrigos gerenciarem solicitações
-- **Integração com Banco**: Tabela `adoption_requests` com relacionamentos adequados
-- **Fluxo Completo**: Adotante solicita → Abrigo aprova/rejeita → Status atualizado
-
-### Frontend & UX/UI (100% completo)
+### Frontend & UX/UI (95% completo)
 - Design Kawaii: Implementado com paleta rosa-laranja
 - Responsividade: Funciona em desktop e mobile
 - Animações: Transições e efeitos visuais (bounce, float, hover effects)
@@ -187,47 +174,49 @@ npm run dev
 - Botões Gradientes: Com efeitos hover e estilo rosa-laranja
 - Elementos Visuais: Gatinhos (🐱), patinhas (🐾), corações (💕)
 
-### Páginas Públicas (100% completo)
+### Páginas Públicas (90% completo)
 - Home Page: Com busca e listagem de pets disponíveis
 - Página de Detalhe do Pet: Visualização completa com galeria de fotos
-- Página de Anúncio de Pet: `/addpet` (pública)
-- Página de Abrigos: `/shelters` com listagem de parceiros
-- Página de Configurações de Conta: `/account-settings`
-- Barra de Pesquisa: Funcional no header público
-- Confirmação de Logout: Modal com "Sim/Não" para deslogar
 - Layouts Organizados: (auth), (dashboard), (public) com proteção adequada
 - Elementos Decorativos: Coerentes com o design kawaii
 
-### Serviços Backend (100% completo)
+### Serviços Backend (95% completo)
 - petService.ts: Com todas as operações CRUD
-- adoptionService.ts: Serviço completo para solicitações de adoção
 - Integração Supabase: Client-side fully configured
 - Upload de Fotos: Funcional com tratamento de múltiplas imagens
 - Tipagem TypeScript: Completa com interfaces bem definidas
 - Tratamento de Erros: Robusto em todas as operações
 - Cache & Optimistic Updates: Configurações básicas implementadas
 
-### Segurança & Performance (100% completo)
+### Segurança & Performance (85% completo)
 - Row Level Security: Configurado para todas as tabelas
 - Proteção de Storage: Restrições adequadas no Supabase Storage
 - Validação de Dados: Frontend e backend com Zod
 - Sanitização de Inputs: Implementada para prevenção de XSS
 - Carregamento Otimizado: Imagens com lazy loading
-- Proteção contra Loops: Correção de problemas de estado de autenticação
 
-## Funcionalidades Pendentes (5% restante)
+## Funcionalidades Pendentes (15% restante)
 
-### Recursos Avançados (20% completo)
-- Sistema de Mensagens: Entre adotantes e abrigos
-- Integração com Mapas: Para localização de abrigos
-- Sistema de Avaliações: Após adoção ser completada
-- Filtros Avançados: Busca refinada na home page (raça, vacinação, etc.)
+### Sistema de Solicitações de Adoção (0% completo)
+- Formulário de Adoção Completo: Com validações e campos completos
+- Backend para Solicitações: Serviço completo para `adoption_requests`
+- Dashboard de Solicitações: Página para aprovar/rejeitar pedidos
+- Visualização de Solicitações Recebidas: Para abrigos verem pedidos
+- Controle de Status de Adoção: Acompanhamento do processo
+- Notificações de Nova Solicitação: Alertas para abrigos
 
 ### Notificações & Realtime (0% completo)
 - Sistema de Notificações: Toasts para eventos importantes
 - Updates em Tempo Real: Com Supabase Realtime
 - Alertas para Abrigos: Quando nova solicitação chega
 - Notificações Push: Opcionais para atualizações importantes
+
+### Recursos Avançados (20% completo)
+- Sistema de Avaliações: Após adoção ser completada
+- Filtros Avançados: Busca refinada na home page (raça, vacinação, etc.)
+- Integração com Mapas: Para localização de abrigos
+- Sistema de Mensagens: Entre adotantes e abrigos
+- Relatórios Estatísticos: Para abrigos (taxas de adoção, etc.)
 
 ### Qualidade & Documentação (0% completo)
 - Testes Unitários: Para componentes e serviços
@@ -253,11 +242,17 @@ npm run dev
 
 ## Próximos Passos para 100% Completo
 
-### Recursos Avançados (80% restante)
-1. Implementar sistema de mensagens entre adotantes e abrigos
-2. Adicionar integração com mapas para localização de abrigos
-3. Implementar sistema de avaliações pós-adoção
-4. Adicionar filtros avançados na página de busca
+### Sistema de Adoção (25% restante)
+1. Implementar formulário de solicitação de adoção
+2. Criar backend para gerenciamento de solicitações
+3. Desenvolver dashboard de solicitações para abrigos
+4. Adicionar notificações básicas
+
+### Recursos Avançados (20% restante)
+1. Implementar filtros avançados
+2. Adicionar sistema de avaliações
+3. Melhorar performance com caching
+4. Adicionar internacionalização
 
 ### Qualidade e Documentação (25% restante)
 1. Escrever testes unitários e de integração
@@ -281,6 +276,4 @@ O projeto Kitty está em um estado excepcionalmente avançado, com todas as func
 
 O CRUD completo do dashboard está 100% funcional, permitindo que abrigos gerenciem seus pets com total eficiência. O sistema de autenticação está robusto e seguro, com controle de acesso baseado em papéis.
 
-O sistema de adoção está completamente implementado, desde a solicitação na página do pet até o gerenciamento no dashboard do abrigo. As páginas públicas de anúncio, abrigos e configurações estão todas completas e integradas com o design kawaii.
-
-O projeto está praticamente pronto para uso em produção para as funcionalidades principais. As funcionalidades pendentes são principalmente recursos avançados que incrementariam ainda mais a experiência do usuário, mas não são críticas para o funcionamento do sistema.
+O projeto está pronto para uso em produção para as funcionalidades principais. As funcionalidades pendentes são principalmente recursos avançados que incrementariam ainda mais a experiência do usuário, mas não são críticas para o funcionamento do sistema.

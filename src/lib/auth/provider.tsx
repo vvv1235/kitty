@@ -26,27 +26,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
+    let isMounted = true; // Flag para verificar se o componente ainda está montado
+
     // Check active session
     checkUserSession();
 
     // Set up real-time authentication listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!isMounted) return; // Previne atualizações após desmontagem
+        
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           if (session?.user?.id) {
             const userData = await getUserData(session.user.id);
-            if (userData) {
+            if (userData && isMounted) {
               setUser(userData);
             }
           }
         } else if (event === 'SIGNED_OUT') {
-          setUser(null);
+          if (isMounted) {
+            setUser(null);
+          }
         }
-        setIsLoading(false);
+        // Só definimos isLoading como false se ainda estiver carregando
+        if (isLoading && isMounted) {
+          setIsLoading(false);
+        }
       }
     );
 
     return () => {
+      isMounted = false;
       authListener.subscription.unsubscribe();
     };
   }, []);
@@ -171,14 +181,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
 
-    // Aguardar um pouco para garantir que o estado esteja atualizado
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // O estado será atualizado pelo listener de autenticação
+    // Não é necessário esperar aqui, pois o listener já cuida disso
     
-    const userData = await getUserData(data.user.id);
-    if (userData) {
-      setUser(userData);
-    }
-
     return data;
   };
 

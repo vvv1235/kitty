@@ -151,5 +151,21 @@ export const petService = {
         }
       }
     }
+  },
+
+  // Obter todos os pets disponíveis
+  async getAllAvailablePets(): Promise<Pet[]> {
+    const { data, error } = await supabase
+      .from('pets')
+      .select('*')
+      .eq('status', 'available')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching all pets:', error);
+      throw new Error(`Failed to fetch pets: ${error.message}`);
+    }
+
+    return data as Pet[];
   }
 };

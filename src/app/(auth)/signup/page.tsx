@@ -22,16 +22,16 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (loading) return; // Prevenir múltiplos cliques
+    
     setLoading(true)
     
     try {
       await signUp(email, password, name, role)
       // Esperar um pouco para garantir que o usuário foi criado no banco de dados
-      setTimeout(() => {
-        // Redirecionar para a página inicial em vez do dashboard
-        // O dashboard só deve ser acessado por usuários com role 'shelter'
-        router.push('/') // Redirecionar para a página inicial após o cadastro
-      }, 1000)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Redirecionar para a página de pets após cadastro
+      window.location.href = '/pets'; // Redirecionar via window.location para evitar possíveis loops com o router
     } catch (error: any) {
       alert(error.message || 'Erro ao criar conta')
       setLoading(false)
@@ -46,9 +46,8 @@ export default function Signup() {
       <div className="kitten-corner br">🐾</div>
       
       <div className="absolute top-4 left-4">
-        <Link href="/" className="flex items-center text-pink-600 hover:text-pink-800">
-          <Cat className="h-5 w-5 mr-2" />
-          <span className="font-bold">Kitty</span>
+        <Link href="/" className="text-pink-600 hover:text-pink-800 font-bold text-lg">
+          Kitty
         </Link>
       </div>
       

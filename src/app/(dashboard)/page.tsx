@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth/provider"
-import { Cat, Heart, PawPrint, Settings, LogOut, Users, PlusCircle } from "lucide-react"
-import ProtectedRoute from "@/components/ProtectedRoute"
+import { Cat, Heart, PawPrint, Settings, LogOut, Users, PlusCircle, MessageSquare } from "lucide-react"
+import ProtectedRoute from "@/lib/auth/protected-route"
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
@@ -45,7 +45,7 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Link href="/dashboard/announce-pet" className="block">
               <div className="bg-white rounded-2xl p-6 card-kawaii hover:shadow-lg transition-all duration-300 h-full">
                 <div className="flex flex-col items-center text-center">
@@ -58,7 +58,7 @@ export default function Dashboard() {
               </div>
             </Link>
             
-            <Link href="/dashboard/pets" className="block">
+            <Link href="/dashboard/my-pets" className="block">
               <div className="bg-white rounded-2xl p-6 card-kawaii hover:shadow-lg transition-all duration-300 h-full">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-pink-100 rounded-full p-3 mb-4">
@@ -66,6 +66,18 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-bold text-lg text-gray-800 mb-2">Meus Pets</h3>
                   <p className="text-gray-600 text-sm">Visualize e gerencie seus pets</p>
+                </div>
+              </div>
+            </Link>
+            
+            <Link href="/dashboard/requests" className="block">
+              <div className="bg-white rounded-2xl p-6 card-kawaii hover:shadow-lg transition-all duration-300 h-full">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-pink-100 rounded-full p-3 mb-4">
+                    <MessageSquare className="h-8 w-8 text-pink-500" />
+                  </div>
+                  <h3 className="font-bold text-lg text-gray-800 mb-2">Solicitações</h3>
+                  <p className="text-gray-600 text-sm">Gerencie solicitações de adoção</p>
                 </div>
               </div>
             </Link>
