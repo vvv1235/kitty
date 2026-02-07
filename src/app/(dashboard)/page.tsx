@@ -46,7 +46,7 @@ export default function Dashboard() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Link href="/dashboard/announce-pet" className="block">
+            <Link href="/announce-pet" className="block">
               <div className="bg-white rounded-2xl p-6 card-kawaii hover:shadow-lg transition-all duration-300 h-full">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-pink-100 rounded-full p-3 mb-4">
@@ -58,7 +58,7 @@ export default function Dashboard() {
               </div>
             </Link>
             
-            <Link href="/dashboard/my-pets" className="block">
+            <Link href="/my-pets" className="block">
               <div className="bg-white rounded-2xl p-6 card-kawaii hover:shadow-lg transition-all duration-300 h-full">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-pink-100 rounded-full p-3 mb-4">
@@ -70,7 +70,7 @@ export default function Dashboard() {
               </div>
             </Link>
             
-            <Link href="/dashboard/requests" className="block">
+            <Link href="/requests" className="block">
               <div className="bg-white rounded-2xl p-6 card-kawaii hover:shadow-lg transition-all duration-300 h-full">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-pink-100 rounded-full p-3 mb-4">
@@ -82,7 +82,7 @@ export default function Dashboard() {
               </div>
             </Link>
             
-            <Link href="/dashboard/settings" className="block">
+            <Link href="/settings" className="block">
               <div className="bg-white rounded-2xl p-6 card-kawaii hover:shadow-lg transition-all duration-300 h-full">
                 <div className="flex flex-col items-center text-center">
                   <div className="bg-pink-100 rounded-full p-3 mb-4">

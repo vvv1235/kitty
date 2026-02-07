@@ -3,11 +3,15 @@
 import { Pet, CreatePetInput, UpdatePetInput } from '@/types/pet';
 import { createClient } from '@/lib/supabase/client';
 
-const supabase = createClient();
+// Função auxiliar para garantir que o cliente está atualizado com a sessão
+const getUpdatedClient = () => {
+  return createClient();
+};
 
 export const petService = {
   // Listar pets de um abrigo específico
   async getPetsByShelter(shelterId: string): Promise<Pet[]> {
+    const supabase = getUpdatedClient();
     const { data, error } = await supabase
       .from('pets')
       .select('*')
@@ -24,6 +28,7 @@ export const petService = {
 
   // Obter um pet específico
   async getPetById(id: string): Promise<Pet | null> {
+    const supabase = getUpdatedClient();
     const { data, error } = await supabase
       .from('pets')
       .select('*')
@@ -44,6 +49,10 @@ export const petService = {
 
   // Criar um novo pet
   async createPet(petData: CreatePetInput, shelterId: string): Promise<Pet> {
+    console.log('[petService] Dados recebidos para insert:', petData);
+    console.log('[petService] shelter_id:', shelterId);
+    
+    const supabase = getUpdatedClient();
     const newPet = {
       ...petData,
       shelter_id: shelterId,
@@ -53,6 +62,8 @@ export const petService = {
       updated_at: new Date().toISOString(),
     };
 
+    console.log('[petService] Objeto final para insert:', newPet);
+    
     const { data, error } = await supabase
       .from('pets')
       .insert([newPet])
@@ -60,15 +71,22 @@ export const petService = {
       .single();
 
     if (error) {
+      console.error('[petService] Erro completo do Supabase:', error);
+      console.error('Message:', error.message);
+      console.error('Details:', error.details);
+      console.error('Hint:', error.hint);
+      console.error('Code:', error.code);
       console.error('Error creating pet:', error);
       throw new Error(`Failed to create pet: ${error.message}`);
     }
-
+    
+    console.log('[petService] Pet salvo com sucesso:', data);
     return data as Pet;
   },
 
   // Atualizar um pet existente
   async updatePet(id: string, petData: UpdatePetInput): Promise<Pet> {
+    const supabase = getUpdatedClient();
     const updateData = {
       ...petData,
       updated_at: new Date().toISOString(),
@@ -91,6 +109,7 @@ export const petService = {
 
   // Deletar um pet
   async deletePet(id: string): Promise<void> {
+    const supabase = getUpdatedClient();
     const { error } = await supabase
       .from('pets')
       .delete()
@@ -104,6 +123,7 @@ export const petService = {
 
   // Upload de fotos para o Supabase Storage
   async uploadPetPhotos(files: File[], petId: string): Promise<string[]> {
+    const supabase = getUpdatedClient();
     const uploadedUrls: string[] = [];
 
     for (const file of files) {
@@ -137,6 +157,7 @@ export const petService = {
 
   // Remover fotos do Supabase Storage
   async removePetPhotos(photoUrls: string[], petId: string): Promise<void> {
+    const supabase = getUpdatedClient();
     for (const url of photoUrls) {
       // Extrair o caminho do arquivo da URL
       const path = url.split('/pet-photos/')[1];
@@ -155,6 +176,7 @@ export const petService = {
 
   // Obter todos os pets disponíveis
   async getAllAvailablePets(): Promise<Pet[]> {
+    const supabase = getUpdatedClient();
     const { data, error } = await supabase
       .from('pets')
       .select('*')

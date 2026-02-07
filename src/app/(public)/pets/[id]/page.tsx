@@ -6,15 +6,18 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/lib/auth/provider"
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { Heart, MapPin, Calendar, Users, Syringe, Scissors, Home, Star, Loader2 } from "lucide-react"
 import { adoptionService } from '@/services/adoptionService';
 import { Pet } from '@/types/pet';
 import { petService } from '@/services/petService';
 
-export default function PetDetail({ params }: { params: { id: string } }) {
+export default function PetDetail() {
   const { user } = useAuth()
   const router = useRouter()
+  const params = useParams();
+  const id = params.id as string;
+
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,9 +26,11 @@ export default function PetDetail({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!id) return;
+
     async function fetchPet() {
       try {
-        const petData = await petService.getPetById(params.id);
+        const petData = await petService.getPetById(id);
         setPet(petData);
       } catch (err) {
         console.error('Error fetching pet:', err);
@@ -36,7 +41,7 @@ export default function PetDetail({ params }: { params: { id: string } }) {
     }
 
     fetchPet();
-  }, [params.id]);
+  }, [id]);
 
   const handleAdoptionRequest = () => {
     if (!user) {

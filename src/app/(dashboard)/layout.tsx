@@ -1,3 +1,5 @@
+'use client'
+
 import ProtectedRoute from '@/lib/auth/protected-route'
 import { ReactNode } from 'react'
 import Link from 'next/link'

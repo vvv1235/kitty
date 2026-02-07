@@ -35,13 +35,13 @@ export default function AnnouncePet() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : (type === 'number' ? Number(value) : value)
     }));
   };
 
@@ -49,6 +49,13 @@ export default function AnnouncePet() {
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleCheckboxChange = (name: keyof CreatePetInput) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: !prev[name as keyof typeof prev]
     }));
   };
 
@@ -78,40 +85,50 @@ export default function AnnouncePet() {
     setPhotos(newPhotos);
   };
 
+  const [loading, setLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
+    if (loading) return;
+
+    setLoading(true);
     setError(null);
-    
+
     if (!user) {
       setError('Você precisa estar logado para anunciar um pet');
-      setSaving(false);
+      setLoading(false);
       return;
     }
-    
+
     try {
-      // Primeiro criar o pet
+      console.log('Criando pet com dados:', formData);
       const newPet = await petService.createPet(formData, user.id);
-      
-      // Se houver fotos para upload, fazer o upload
+      console.log('Pet criado com ID:', newPet.id);
+
       if (photos.length > 0) {
-        const uploadedUrls = await petService.uploadPetPhotos(photos, newPet.id);
-        
-        // Atualizar o pet com as URLs das fotos
-        await petService.updatePet(newPet.id, { 
-          photos: uploadedUrls 
-        });
+        try {
+          console.log('Fazendo upload de', photos.length, 'fotos...');
+          const uploadedUrls = await petService.uploadPetPhotos(photos, newPet.id);
+          console.log('Fotos enviadas:', uploadedUrls);
+
+          await petService.updatePet(newPet.id, { photos: uploadedUrls });
+          console.log('Pet atualizado com fotos');
+        } catch (photoErr) {
+          console.error('Erro ao fazer upload das fotos:', photoErr);
+          // Mesmo que o upload de fotos falhe, o pet já foi criado; ele será exibido sem fotos
+        }
       }
-      
+
       alert('Pet anunciado com sucesso!');
-      router.push('/dashboard/my-pets'); // Redireciona para a lista de pets
-    } catch (err) {
-      console.error('Error creating pet:', err);
-      setError('Falha ao anunciar o pet. Por favor, tente novamente.');
+      router.refresh();
+      router.push('/my-pets');
+    } catch (err: any) {
+      console.error('Erro ao anunciar pet:', err);
+      setError(err.message || 'Falha ao anunciar o pet. Verifique o console para detalhes.');
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-orange-50 p-4 md:p-8">
@@ -273,9 +290,8 @@ export default function AnnouncePet() {
                       <input
                         type="checkbox"
                         id="vaccinated"
-                        name="vaccinated"
                         checked={formData.vaccinated}
-                        onChange={handleChange}
+                        onChange={() => handleCheckboxChange('vaccinated')}
                         className="checkbox-kawaii mr-2"
                       />
                       <Label htmlFor="vaccinated">Vacinado</Label>
@@ -284,9 +300,8 @@ export default function AnnouncePet() {
                       <input
                         type="checkbox"
                         id="dewormed"
-                        name="dewormed"
                         checked={formData.dewormed}
-                        onChange={handleChange}
+                        onChange={() => handleCheckboxChange('dewormed')}
                         className="checkbox-kawaii mr-2"
                       />
                       <Label htmlFor="dewormed">Vermifugado</Label>
@@ -295,9 +310,8 @@ export default function AnnouncePet() {
                       <input
                         type="checkbox"
                         id="sterilized"
-                        name="sterilized"
                         checked={formData.sterilized}
-                        onChange={handleChange}
+                        onChange={() => handleCheckboxChange('sterilized')}
                         className="checkbox-kawaii mr-2"
                       />
                       <Label htmlFor="sterilized">Esterilizado</Label>

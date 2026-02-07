@@ -5,6 +5,11 @@ import type { NextRequest } from 'next/server'
 import type { CookieOptions } from '@supabase/ssr'
 
 export async function middleware(req: NextRequest) {
+  // Permitir acesso às rotas de API sem autenticação de middleware
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next()
+  }
+
   let response = NextResponse.next({
     request: {
       headers: req.headers,
@@ -59,6 +64,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
