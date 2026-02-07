@@ -9,19 +9,33 @@ export default function Logout() {
   const router = useRouter()
 
   useEffect(() => {
-    const logout = async () => {
-      await signOut()
-      router.push('/login')
+    const performLogout = async () => {
+      try {
+        await signOut()  // limpa sessão no client
+
+        // Força refresh server-side para atualizar middleware
+        router.refresh()
+
+        // Redireciona com reload completo para limpar qualquer estado client-side travado
+        window.location.href = '/login'
+        // Alternativa: router.push('/login') + window.location.reload()
+      } catch (err) {
+        console.error('Erro no logout:', err)
+        // Ainda redireciona mesmo com erro
+        window.location.href = '/login'
+      }
     }
-    
+
     if (!isLoading) {
-      logout()
+      performLogout()
     }
   }, [signOut, isLoading, router])
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div>Saindo...</div>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-50 to-orange-50">
+      <div className="text-xl font-medium text-pink-600 animate-pulse">
+        Saindo... Aguarde um momento 🐱
+      </div>
     </div>
   )
 }

@@ -17,23 +17,26 @@ export default function Login() {
   const { signIn } = useAuth()
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (loading) return; // Prevenir múltiplos cliques
-    
-    setLoading(true)
-    
-    try {
-      await signIn(email, password)
-      // Esperar um pouco para garantir que o estado do usuário esteja atualizado
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Redirecionar para a página de pets após login
-      router.push('/pets')
-    } catch (error: any) {
-      alert(error.message || 'Erro ao fazer login')
-      setLoading(false)
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  if (loading) return
+
+  setLoading(true)
+
+  try {
+    const { error } = await signIn(email, password)  // ou supabase.auth.signInWithPassword direto
+
+    if (error) throw error
+
+    // Força refresh server-side + redireciona
+    router.refresh()  // ← CRUCIAL: atualiza middleware com sessão nova
+    router.push('/pets')  // ou '/dashboard'
+  } catch (error: any) {
+    alert(error.message || 'Erro ao fazer login')
+  } finally {
+    setLoading(false)  // sempre desliga loading
   }
+}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50 p-4">

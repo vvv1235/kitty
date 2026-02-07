@@ -1,41 +1,64 @@
+// middleware.ts (substitua todo o conteúdo)
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import type { CookieOptions } from '@supabase/ssr'
 
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl
-  
-  // Rotas públicas que não precisam de autenticação
-  const publicPaths = ['/', '/login', '/signup']
-  
-  // Rotas protegidas que exigem autenticação
-  const protectedPaths = [
-    '/dashboard',
-    '/dashboard/',
-    '/dashboard/announce-pet',
-    '/dashboard/settings'
-  ]
+export async function middleware(req: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  })
 
-  // Se for uma rota pública, permite acesso
-  if (publicPaths.some(path => request.nextUrl.pathname.startsWith(path))) {
-    // Permitir acesso à página inicial
-    if (request.nextUrl.pathname === '/' && !request.cookies.get('kitty-auth-token')) {
-      return NextResponse.next()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
+        },
+        setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options)
+          })
+        },
+      },
     }
-    return NextResponse.next()
+  )
+
+  // Força refresh e pega user (mais confiável em middleware)
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const pathname = req.nextUrl.pathname
+
+  const isPublicPath =
+    pathname === '/' ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/signup')
+
+  const isProtectedPath = pathname.startsWith('/dashboard')
+
+  // Logado em rota pública → vai pro dashboard
+  if (user && isPublicPath) {
+    console.log('Redirecting logged user from public to dashboard')
+    return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
-  // Se for uma rota protegida, verifica autenticação
-  if (protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))) {
-    const token = request.cookies.get('kitty-auth-token') 
-    if (!token) {
-      // Redireciona para login se não estiver autenticado
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
+  // Não logado em rota protegida → vai pro login
+  if (!user && isProtectedPath) {
+    console.log('Redirecting unauthenticated to login from:', pathname)
+    const redirectUrl = new URL('/login', req.url)
+    redirectUrl.searchParams.set('redirectTo', pathname)
+    return NextResponse.redirect(redirectUrl)
   }
-  
-  return NextResponse.next()
+
+  return response
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)']
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

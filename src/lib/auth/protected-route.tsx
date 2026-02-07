@@ -19,23 +19,26 @@ export default function ProtectedRoute({
   const router = useRouter()
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!user) {
-        router.push(redirectTo)
-      } else if (requiredRole && user.role !== requiredRole) {
-        // Redirect to unauthorized page or home
-        router.push('/')
-      }
+    if (!isLoading && !user) {
+      router.push(redirectTo)
+    } else if (!isLoading && user && requiredRole && user.role !== requiredRole) {
+      // Redirect to unauthorized page or home
+      router.push('/')
     }
   }, [user, isLoading, redirectTo, requiredRole, router])
 
-  // Show loading state while checking authentication
-  if (isLoading || (!user && !isLoading)) {
+  // Show loading state only while checking authentication
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Verificando autenticação...</div>
+        <div className="text-lg">Carregando...</div>
       </div>
     )
+  }
+
+  // If not authenticated and not loading, redirect should have happened by now
+  if (!user && !isLoading) {
+    return null // The redirect effect should handle navigation
   }
 
   // Check role requirements

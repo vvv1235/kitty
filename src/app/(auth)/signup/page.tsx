@@ -20,23 +20,29 @@ export default function Signup() {
   const { signUp } = useAuth()
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (loading) return; // Prevenir múltiplos cliques
-    
-    setLoading(true)
-    
-    try {
-      await signUp(email, password, name, role)
-      // Esperar um pouco para garantir que o usuário foi criado no banco de dados
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Redirecionar para a página de pets após cadastro
-      window.location.href = '/pets'; // Redirecionar via window.location para evitar possíveis loops com o router
-    } catch (error: any) {
-      alert(error.message || 'Erro ao criar conta')
-      setLoading(false)
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  if (loading) return
+
+  setLoading(true)
+
+  try {
+    await signUp(email, password, name, role)
+
+    // Força sincronização da sessão com o server-side (middleware vê usuário logado)
+    router.refresh()
+
+    // Redireciona com reload completo para evitar loops client-side
+    window.location.href = '/pets'
+    // Alternativa mais suave (se preferir sem reload completo):
+    // router.push('/pets')
+  } catch (error: any) {
+    console.error('Signup error:', error)
+    alert(error.message || 'Erro ao criar conta. Verifique os dados e tente novamente.')
+  } finally {
+    setLoading(false)  // Sempre desliga o loading, mesmo em erro
   }
+}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50 p-4">
