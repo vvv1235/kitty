@@ -8,35 +8,37 @@ import Link from "next/link"
 import { useState } from "react"
 import { useAuth } from "@/lib/auth/provider"
 import { useRouter } from 'next/navigation'
-import { Cat, Mail, Lock, Heart } from "lucide-react"
+import { Cat, Mail, Lock, Heart, Eye, EyeOff } from "lucide-react"
+import { PasswordInput } from "@/components/ui/password-input"
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
   const router = useRouter()
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  if (loading) return
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (loading) return
 
-  setLoading(true)
+    setLoading(true)
 
-  try {
-    const { error } = await signIn(email, password)  // ou supabase.auth.signInWithPassword direto
+    try {
+      const { error } = await signIn(email, password)
 
-    if (error) throw error
+      if (error) throw error
 
-    // Força refresh server-side + redireciona
-    router.refresh()  // ← CRUCIAL: atualiza middleware com sessão nova
-    router.push('/pets')  // ou '/dashboard'
-  } catch (error: any) {
-    alert(error.message || 'Erro ao fazer login')
-  } finally {
-    setLoading(false)  // sempre desliga loading
+      // Força refresh server-side + redireciona
+      router.refresh()  // ← CRUCIAL: atualiza middleware com sessão nova
+      router.push('/pets')  // ou '/dashboard'
+    } catch (error: any) {
+      alert(error.message || 'Erro ao fazer login')
+    } finally {
+      setLoading(false)  // sempre desliga loading
+    }
   }
-}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50 p-4">
@@ -81,12 +83,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <Lock className="h-4 w-4 mr-1 text-pink-400" />
                 <Label htmlFor="password">Senha</Label>
               </div>
-              <Input 
-                id="password" 
-                type="password" 
+              <PasswordInput
+                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required 
+                required
                 className="input-kawaii"
               />
             </div>

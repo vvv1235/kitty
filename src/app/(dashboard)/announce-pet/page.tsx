@@ -120,7 +120,7 @@ export default function AnnouncePet() {
 
       alert('Pet anunciado com sucesso!');
       router.refresh();
-      router.push('/my-pets');
+      window.location.href = '/pets';
     } catch (err: any) {
       console.error('Erro ao anunciar pet:', err);
       setError(err.message || 'Falha ao anunciar o pet. Verifique o console para detalhes.');

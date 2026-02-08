@@ -10,39 +10,46 @@ import { useState } from "react"
 import { useAuth } from "@/lib/auth/provider"
 import { useRouter } from 'next/navigation'
 import { Cat, User, Mail, Lock, Heart } from "lucide-react"
+import { PasswordInput } from "@/components/ui/password-input"
 
 export default function Signup() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [role, setRole] = useState<'adopter' | 'shelter'>('adopter')
   const [loading, setLoading] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  if (loading) return
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (loading) return
 
-  setLoading(true)
+    if (password !== confirmPassword) {
+      alert('As senhas não coincidem. Por favor, tente novamente.')
+      return
+    }
 
-  try {
-    await signUp(email, password, name, role)
+    setLoading(true)
 
-    // Força sincronização da sessão com o server-side (middleware vê usuário logado)
-    router.refresh()
+    try {
+      await signUp(email, password, name, role)
 
-    // Redireciona com reload completo para evitar loops client-side
-    window.location.href = '/pets'
-    // Alternativa mais suave (se preferir sem reload completo):
-    // router.push('/pets')
-  } catch (error: any) {
-    console.error('Signup error:', error)
-    alert(error.message || 'Erro ao criar conta. Verifique os dados e tente novamente.')
-  } finally {
-    setLoading(false)  // Sempre desliga o loading, mesmo em erro
+      // Força sincronização da sessão com o server-side (middleware vê usuário logado)
+      router.refresh()
+
+      // Redireciona com reload completo para evitar loops client-side
+      window.location.href = '/pets'
+      // Alternativa mais suave (se preferir sem reload completo):
+      // router.push('/pets')
+    } catch (error: any) {
+      console.error('Signup error:', error)
+      alert(error.message || 'Erro ao criar conta. Verifique os dados e tente novamente.')
+    } finally {
+      setLoading(false)  // Sempre desliga o loading, mesmo em erro
+    }
   }
-}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50 p-4">
@@ -100,11 +107,25 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <Lock className="h-4 w-4 mr-1 text-pink-400" />
                 <Label htmlFor="password">Senha</Label>
               </div>
-              <Input 
+              <PasswordInput 
                 id="password" 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required 
+                className="input-kawaii"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center text-sm text-gray-600 mb-1">
+                <Lock className="h-4 w-4 mr-1 text-pink-400" />
+                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              </div>
+              <PasswordInput 
+                id="confirmPassword" 
+                type="password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required 
                 className="input-kawaii"
               />
