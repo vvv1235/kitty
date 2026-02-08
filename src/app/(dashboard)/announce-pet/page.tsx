@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/provider';
 import { Cat, PawPrint, Calendar, Users, Heart, MapPin, Upload, Save, X } from "lucide-react"
 import { petService } from '@/services/petService';
+import { uploadPetPhotos } from '@/utils/file-upload';
 
 export default function AnnouncePet() {
   const router = useRouter();
@@ -107,11 +108,14 @@ export default function AnnouncePet() {
       if (photos.length > 0) {
         try {
           console.log('Fazendo upload de', photos.length, 'fotos...');
-          const uploadedUrls = await petService.uploadPetPhotos(photos, newPet.id);
-          console.log('Fotos enviadas:', uploadedUrls);
-
-          await petService.updatePet(newPet.id, { photos: uploadedUrls });
-          console.log('Pet atualizado com fotos');
+          const uploadResult = await uploadPetPhotos(photos, newPet.id);
+          
+          if (uploadResult.success) {
+            console.log('Fotos enviadas:', uploadResult.urls);
+          } else {
+            console.error('Erro no upload de fotos:', uploadResult.error);
+            // Não impedir a continuidade se o upload de fotos falhar
+          }
         } catch (photoErr) {
           console.error('Erro ao fazer upload das fotos:', photoErr);
           // Mesmo que o upload de fotos falhe, o pet já foi criado; ele será exibido sem fotos

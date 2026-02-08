@@ -126,76 +126,79 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Nome */}
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nome Completo</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Seu nome completo"
-                      className="pl-10 input-kawaii"
-                    />
-                  </div>
+                  <Label htmlFor="name" className="flex items-center">
+                    <User className="h-4 w-4 mr-2 text-pink-400" />
+                    Nome Completo
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Seu nome completo"
+                    className="input-kawaii"
+                  />
                 </div>
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="seu.email@example.com"
-                      className="pl-10 input-kawaii"
-                      readOnly // Email geralmente não é editável diretamente
-                    />
-                  </div>
+                  <Label htmlFor="email" className="flex items-center">
+                    <Mail className="h-4 w-4 mr-2 text-pink-400" />
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="seu.email@example.com"
+                    className="input-kawaii"
+                    readOnly // Email geralmente não é editável diretamente
+                  />
                 </div>
 
                 {/* Papel */}
                 <div className="space-y-2">
-                  <Label htmlFor="role">Tipo de Conta</Label>
-                  <div className="relative">
-                    <Users className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
-                    <Select value={formData.role} onValueChange={(value) => handleSelectChange('role', value)} disabled>
-                      <SelectTrigger className="pl-10 input-kawaii">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="adopter">Adotante</SelectItem>
-                        <SelectItem value="shelter">Abrigo</SelectItem>
-                        <SelectItem value="admin">Administrador</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Label htmlFor="role" className="flex items-center">
+                    <Users className="h-4 w-4 mr-2 text-pink-400" />
+                    Tipo de Conta
+                  </Label>
+                  <Select value={formData.role} onValueChange={(value) => handleSelectChange('role', value)} disabled>
+                    <SelectTrigger className="input-kawaii">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="adopter">Adotante</SelectItem>
+                      <SelectItem value="shelter">Abrigo</SelectItem>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Localização */}
                 <div className="space-y-2">
-                  <Label htmlFor="location">Localização</Label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
-                    <Input
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      placeholder="Cidade, Estado"
-                      className="pl-10 input-kawaii"
-                    />
-                  </div>
+                  <Label htmlFor="location" className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-2 text-pink-400" />
+                    Localização
+                  </Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="Cidade, Estado"
+                    className="input-kawaii"
+                  />
                 </div>
               </div>
 
               {/* Foto de Perfil */}
               <div className="space-y-3">
-                <Label>Foto de Perfil</Label>
+                <Label className="flex items-center">
+                  <Camera className="h-4 w-4 mr-2 text-pink-400" />
+                  Foto de Perfil
+                </Label>
                 <div className="flex items-center">
                   <div className="relative">
                     <div className="w-16 h-16 rounded-full bg-pink-200 flex items-center justify-center">
@@ -217,17 +220,17 @@ export default function SettingsPage() {
 
               {/* Senha */}
               <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Deixe em branco para manter a senha atual"
-                    className="pl-10 input-kawaii"
-                  />
-                </div>
+                <Label htmlFor="password" className="flex items-center">
+                  <Lock className="h-4 w-4 mr-2 text-pink-400" />
+                  Senha
+                </Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Deixe em branco para manter a senha atual"
+                  className="input-kawaii"
+                />
                 <p className="text-xs text-gray-500">Digite uma nova senha apenas se quiser alterar a atual</p>
               </div>
 

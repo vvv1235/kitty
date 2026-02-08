@@ -57,7 +57,7 @@ export const petService = {
       ...petData,
       shelter_id: shelterId,
       status: 'available',
-      photos: petData.photos || [],
+      photos: petData.photos || [], // Initialize with empty array if not provided
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -118,59 +118,6 @@ export const petService = {
     if (error) {
       console.error('Error deleting pet:', error);
       throw new Error(`Failed to delete pet: ${error.message}`);
-    }
-  },
-
-  // Upload de fotos para o Supabase Storage
-  async uploadPetPhotos(files: File[], petId: string): Promise<string[]> {
-    const supabase = getUpdatedClient();
-    const uploadedUrls: string[] = [];
-
-    for (const file of files) {
-      // Gerar nome único para o arquivo
-      const fileName = `${petId}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${file.type.split('/')[1]}`;
-      
-      const { data, error } = await supabase.storage
-        .from('pet-photos')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (error) {
-        console.error('Error uploading photo:', error);
-        throw new Error(`Failed to upload photo: ${error.message}`);
-      }
-
-      // Obter URL pública
-      const { data: publicData } = supabase.storage
-        .from('pet-photos')
-        .getPublicUrl(fileName);
-
-      if (publicData) {
-        uploadedUrls.push(publicData.publicUrl);
-      }
-    }
-
-    return uploadedUrls;
-  },
-
-  // Remover fotos do Supabase Storage
-  async removePetPhotos(photoUrls: string[], petId: string): Promise<void> {
-    const supabase = getUpdatedClient();
-    for (const url of photoUrls) {
-      // Extrair o caminho do arquivo da URL
-      const path = url.split('/pet-photos/')[1];
-      if (path) {
-        const { error } = await supabase.storage
-          .from('pet-photos')
-          .remove([path]);
-
-        if (error) {
-          console.error('Error removing photo:', error);
-          // Não lançamos erro aqui para não interromper o processo
-        }
-      }
     }
   },
 

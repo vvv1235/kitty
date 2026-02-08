@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/auth/provider';
 import { useRouter } from 'next/navigation';
 import { Cat, Dog, Heart, MapPin, Calendar, Users, Save, X, Upload } from 'lucide-react';
 import { petService } from '@/services/petService';
+import { uploadPetPhotos } from '@/utils/file-upload';
 
 export default function EditPet({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -130,22 +131,29 @@ export default function EditPet({ params }: { params: { id: string } }) {
       
       // Se houver novas fotos para upload
       if (newPhotos.length > 0 && user?.id) {
-        // Fazer upload das novas fotos
-        const uploadedUrls = await petService.uploadPetPhotos(newPhotos, params.id);
+        // Fazer upload das novas fotos usando a função de utilitário
+        const uploadResult = await uploadPetPhotos(newPhotos, params.id);
         
-        // Atualizar novamente com as novas URLs de fotos
-        await petService.updatePet(params.id, { 
-          ...formData, 
-          status,
-          photos: [...(updatedPet.photos || []), ...uploadedUrls]
-        });
+        if (uploadResult.success) {
+          // Atualizar novamente com as novas URLs de fotos
+          await petService.updatePet(params.id, { 
+            ...formData, 
+            status,
+            photos: [...(updatedPet.photos || []), ...uploadResult.urls!]
+          });
+        } else {
+          throw new Error(uploadResult.error || 'Falha no upload de fotos');
+        }
+      } else {
+        // Se não houver novas fotos, apenas atualizar os dados
+        await petService.updatePet(params.id, { ...formData, status });
       }
       
       alert('Pet atualizado com sucesso!');
       router.push('/dashboard/my-pets');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating pet:', err);
-      alert('Falha ao atualizar o pet. Por favor, tente novamente.');
+      alert(`Falha ao atualizar o pet. ${err.message || 'Por favor, tente novamente.'}`);
     } finally {
       setSaving(false);
     }
