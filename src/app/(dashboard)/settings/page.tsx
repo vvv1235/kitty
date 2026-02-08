@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Cat, User, Mail, Save, Shield, Palette, Bell, MapPin } from 'lucide-react'
-import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/lib/auth/provider'
 
 export default function Settings() {
@@ -183,9 +182,11 @@ export default function Settings() {
                     <p className="text-sm text-gray-700 mr-4">
                       Receba alertas sobre novas solicitações de adoção.
                     </p>
-                    <Switch
+                    <input
+                      type="checkbox"
                       checked={notificationsEnabled}
-                      onCheckedChange={setNotificationsEnabled}
+                      onChange={(e) => setNotificationsEnabled(e.target.checked)}
+                      className="w-5 h-5 cursor-pointer"
                     />
                   </div>
                 </div>

@@ -109,16 +109,17 @@ export default function AnnouncePet() {
         try {
           console.log('Fazendo upload de', photos.length, 'fotos...');
           const uploadResult = await uploadPetPhotos(photos, newPet.id);
+          console.log('Resultado do upload de fotos:', uploadResult);
           
           if (uploadResult.success) {
-            console.log('Fotos enviadas:', uploadResult.urls);
+            console.log('Fotos enviadas com sucesso. URLs:', uploadResult.urls);
           } else {
             console.error('Erro no upload de fotos:', uploadResult.error);
-            // Não impedir a continuidade se o upload de fotos falhar
+            alert(`O pet foi criado, mas houve um erro ao enviar as fotos: ${uploadResult.error}`);
           }
         } catch (photoErr) {
           console.error('Erro ao fazer upload das fotos:', photoErr);
-          // Mesmo que o upload de fotos falhe, o pet já foi criado; ele será exibido sem fotos
+          alert('O pet foi criado, mas ocorreu um erro inesperado ao enviar as fotos. Veja o console para detalhes.');
         }
       }
 

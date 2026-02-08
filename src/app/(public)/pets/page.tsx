@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, MapPin, Calendar, Users, Syringe, Scissors } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Heart, MapPin, Search } from 'lucide-react';
 import { Pet } from '@/types/pet';
 import { petService } from '@/services/petService';
 import Link from 'next/link';
@@ -13,6 +14,7 @@ export default function PetsPage() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     async function fetchPets() {
@@ -30,6 +32,19 @@ export default function PetsPage() {
 
     fetchPets();
   }, []);
+
+  const filteredPets = pets.filter((pet) => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+
+    return (
+      pet.name.toLowerCase().includes(term) ||
+      pet.breed.toLowerCase().includes(term) ||
+      pet.location.toLowerCase().includes(term) ||
+      pet.color.toLowerCase().includes(term) ||
+      pet.species.toLowerCase().includes(term)
+    );
+  });
 
   if (loading) {
     return (
@@ -77,17 +92,34 @@ export default function PetsPage() {
     );
   }
 
+  const hasPets = pets.length > 0;
+  const hasFilteredPets = filteredPets.length > 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-orange-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-pink-600">Pets Disponíveis para Adoção</h1>
-          <Badge variant="secondary" className="bg-pink-100 text-pink-800">
-            {pets.length} {pets.length === 1 ? 'pet' : 'pets'} disponíveis
-          </Badge>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl md:text-3xl font-bold text-pink-600">Pets Disponíveis para Adoção</h1>
+            <Badge variant="secondary" className="bg-pink-100 text-pink-800">
+              {filteredPets.length} {filteredPets.length === 1 ? 'pet' : 'pets'}
+            </Badge>
+          </div>
+
+          {/* Barra de pesquisa com lupa SEPARADA à esquerda */}
+          <div className="w-full md:w-80 flex items-center gap-3 bg-white rounded-full shadow-md px-5 py-3 border border-pink-200">
+            <Search className="h-6 w-6 text-pink-500 flex-shrink-0" />
+            <Input
+              type="text"
+              placeholder="Buscar por nome, raça, cidade, espécie..."
+              className="border-none focus:ring-0 bg-transparent placeholder:text-pink-400 text-pink-600 text-base outline-none"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
         
-        {pets.length === 0 ? (
+        {!hasPets ? (
           <Card className="card-kawaii text-center py-12">
             <CardContent>
               <div className="flex justify-center mb-4">
@@ -99,9 +131,28 @@ export default function PetsPage() {
               <p className="text-gray-600 mb-4">Volte mais tarde para ver novos pets disponíveis para adoção</p>
             </CardContent>
           </Card>
+        ) : !hasFilteredPets ? (
+          <Card className="card-kawaii text-center py-12">
+            <CardContent>
+              <div className="flex justify-center mb-4">
+                <div className="bg-pink-100 rounded-full p-4">
+                  <Heart className="h-12 w-12 text-pink-500" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Nenhum pet encontrado</h3>
+              <p className="text-gray-600 mb-4">Tente ajustar os termos da sua busca ou limpar o campo de pesquisa.</p>
+              <Button
+                variant="outline"
+                className="border-pink-200 text-pink-600 hover:bg-pink-50"
+                onClick={() => setSearchTerm('')}
+              >
+                Limpar busca
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pets.map((pet) => (
+            {filteredPets.map((pet) => (
               <Card key={pet.id} className="card-kawaii overflow-hidden">
                 <div className="relative">
                   <img 

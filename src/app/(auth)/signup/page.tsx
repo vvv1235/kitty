@@ -17,7 +17,7 @@ export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [role, setRole] = useState<'adopter' | 'shelter'>('adopter')
+  //const [role, setRole] = useState<'adopter' | 'shelter'>('adopter')
   const [loading, setLoading] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
@@ -34,7 +34,8 @@ export default function Signup() {
     setLoading(true)
 
     try {
-      await signUp(email, password, name, role)
+      //await signUp(email, password, name, role)
+      await signUp(email, password, name, 'adopter') // Role comentado para remover escolha
 
       // Força sincronização da sessão com o server-side (middleware vê usuário logado)
       router.refresh()
@@ -130,21 +131,24 @@ export default function Signup() {
                 className="input-kawaii"
               />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center text-sm text-gray-600 mb-1">
-                <Heart className="h-4 w-4 mr-1 text-pink-400" />
-                <Label htmlFor="role">Tipo de usuário</Label>
-              </div>
-              <Select value={role} onValueChange={(value: 'adopter' | 'shelter') => setRole(value)}>
-                <SelectTrigger className="input-kawaii">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="adopter">Adotante</SelectItem>
-                  <SelectItem value="shelter">Abrigo</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Campo de role comentado para futura reativação */}
+          {/*
+          <div className="space-y-2">
+            <div className="flex items-center text-sm text-gray-600 mb-1">
+              <Heart className="h-4 w-4 mr-1 text-pink-400" />
+              <Label htmlFor="role">Tipo de usuário</Label>
             </div>
+            <Select value={role} onValueChange={(value: 'adopter' | 'shelter') => setRole(value)}>
+              <SelectTrigger className="input-kawaii">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="adopter">Adotante</SelectItem>
+                <SelectItem value="shelter">Abrigo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          */}
             <Button 
               type="submit" 
               className="w-full bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white px-4 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300" 

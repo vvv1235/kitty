@@ -124,7 +124,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return newData as User;
         }
       } else {
-        console.error('Error fetching user data:', error);
+        // Log mais amigável para evitar assustar com erros genéricos no console
+        console.warn('Não foi possível carregar os dados do usuário (users). O usuário continuará como null.', error);
       }
       return null;
     }
