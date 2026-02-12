@@ -150,7 +150,7 @@ export default function EditPet({ params }: { params: { id: string } }) {
       }
       
       alert('Pet atualizado com sucesso!');
-      router.push('/dashboard/my-pets');
+      router.push('/my-pets');
     } catch (err: any) {
       console.error('Error updating pet:', err);
       alert(`Falha ao atualizar o pet. ${err.message || 'Por favor, tente novamente.'}`);
@@ -206,7 +206,7 @@ export default function EditPet({ params }: { params: { id: string } }) {
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Pet não encontrado</h3>
             <p className="text-gray-600 mb-4">O pet que você está tentando editar não existe ou você não tem permissão para editá-lo.</p>
             <Button 
-              onClick={() => router.push('/dashboard/pets')}
+              onClick={() => router.push('/pets')}
               className="bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white"
             >
               Voltar para Meus Pets
@@ -484,7 +484,7 @@ export default function EditPet({ params }: { params: { id: string } }) {
                 <Button 
                   type="button" 
                   variant="outline"
-                  onClick={() => router.push('/dashboard/my-pets')}
+                  onClick={() => router.push('/my-pets')}
                   className="border-pink-200 text-pink-600 hover:bg-pink-50"
                   disabled={saving}
                 >

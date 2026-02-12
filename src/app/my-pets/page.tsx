@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth/provider';
 import { PlusCircle, Edit, Trash2, Eye, Heart, Users, MapPin, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { petService } from '@/services/petService';
+import ProtectedRoute from '@/lib/auth/protected-route';
 
 export default function PetsList() {
   const { user } = useAuth();
@@ -19,7 +20,7 @@ export default function PetsList() {
     async function fetchPets() {
       try {
         if (user?.id) {
-          const petsData = await petService.getPetsByShelter(user.id);
+          const petsData = await petService.getPetsByUser(user.id);
           setPets(petsData);
         }
       } catch (err) {
@@ -52,7 +53,7 @@ export default function PetsList() {
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-pink-600">Meus Pets</h1>
-            <Link href="/dashboard/announce-pet">
+            <Link href="/addpet">
               <Button className="bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white">
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Adicionar Pet
@@ -104,6 +105,7 @@ export default function PetsList() {
   }
 
   return (
+    <ProtectedRoute requiredRole="adopter">
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-orange-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
@@ -126,7 +128,7 @@ export default function PetsList() {
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Nenhum pet cadastrado</h3>
               <p className="text-gray-600 mb-4">Comece adicionando seu primeiro pet para adoção</p>
-              <Link href="/dashboard/announce-pet">
+              <Link href="/addpet">
                 <Button className="bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white">
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Adicionar Pet
@@ -158,7 +160,7 @@ export default function PetsList() {
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-xl text-gray-800">{pet.name}</CardTitle>
                     <div className="flex space-x-2">
-                      <Link href={`/dashboard/my-pets/${pet.id}/edit`}>
+                      <Link href={`/my-pets/${pet.id}/edit`}>
                         <Button variant="ghost" size="icon" className="text-pink-500 hover:text-pink-700">
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -209,7 +211,7 @@ export default function PetsList() {
                           Ver
                         </Button>
                       </Link>
-                      <Link href={`/dashboard/my-pets/${pet.id}/edit`}>
+                      <Link href={`/my-pets/${pet.id}/edit`}>
                         <Button size="sm" className="flex-1 bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white">
                           <Edit className="h-4 w-4 mr-1" />
                           Editar
@@ -224,5 +226,6 @@ export default function PetsList() {
         )}
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

@@ -32,8 +32,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           
           <nav>
             <ul className="flex space-x-6">
+              <li><Link href="/my-pets" className="flex items-center text-gray-600 hover:text-pink-600"><Cat className="h-4 w-4 mr-1" /> Meus Pets</Link></li>
               <li><Link href="/addpet" className="flex items-center text-gray-600 hover:text-pink-600"><PlusCircle className="h-4 w-4 mr-1" /> Anunciar Pet</Link></li>
-              <li><Link href="/shelters" className="flex items-center text-gray-600 hover:text-pink-600"><Users className="h-4 w-4 mr-1" /> Abrigos</Link></li>
               <li><Link href="/account-settings" className="flex items-center text-gray-600 hover:text-pink-600"><Settings className="h-4 w-4 mr-1" /> Configurações</Link></li>
               <li>
                 <button 

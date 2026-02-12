@@ -17,7 +17,7 @@ export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  //const [role, setRole] = useState<'adopter' | 'shelter'>('adopter')
+//  //const [role, setRole] = useState<'adopter' | 'shelter'>('adopter')
   const [loading, setLoading] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
@@ -138,13 +138,13 @@ export default function Signup() {
               <Heart className="h-4 w-4 mr-1 text-pink-400" />
               <Label htmlFor="role">Tipo de usuário</Label>
             </div>
-            <Select value={role} onValueChange={(value: 'adopter' | 'shelter') => setRole(value)}>
+//            <Select value={role} onValueChange={(value: 'adopter' | 'shelter') => setRole(value)}>
               <SelectTrigger className="input-kawaii">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="adopter">Adotante</SelectItem>
-                <SelectItem value="shelter">Abrigo</SelectItem>
+//                <SelectItem value="shelter">Abrigo</SelectItem>
               </SelectContent>
             </Select>
           </div>

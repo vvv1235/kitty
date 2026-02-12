@@ -1,286 +1,120 @@
-# Kitty - Plataforma de Adoção de Animais
+# Kitty - Plataforma de Adoção de Pets
 
-Kitty é uma plataforma web full-stack para adoção de gatos (e outros animais de estimação, como cães ou coelhos, mas com foco inicial em gatos). O objetivo principal é conectar adotantes com abrigos/ONGs, facilitando adoções responsáveis. O design é "kawaii" com fundo branco, detalhes rosas e animações de gatinhos para criar uma experiência fofa e acolhedora.
+Kitty é uma plataforma web full-stack para adoção de pets, qualquer usuário logado pode anunciar pets e receber solicitações diretamente.
 
 ## Status do Projeto
+- **Status Geral:** Em fase P2P estável (funcional). Recomenda-se testes manuais finais.
+- **Histórico do status original:** 95% completo na fase com abrigos; agora focado em P2P simples.
 
-**Status Geral: 95% Completo**
+## Funcionalidades (mescla do original + P2P)
+- Páginas públicas: Home e listagem `/pets` com busca/filtros e cards.
+- Detalhe do pet: fotos, descrição, status. Botão “Solicitar Adoção” leva à página dedicada `/pets/[id]/adopt` (fluxo direto com o anunciante).
+- Fluxo de adoção em página (não modal): formulário com mensagem para o anunciante e envio via `adoptionService`.
+- Anúncio de pet: `/addpet` (inicia público, exige login no fluxo) com fotos, status e campos completos.
+- Meus Pets: `/my-pets` para listar/gerenciar anúncios e `/my-pets/[id]/edit` para edição.
+- Header público enxuto: **Meus Pets | Anunciar Pet | Configurações | Sair** (sem “Abrigos”, sem “Pets” redundante).
+- Dashboard legacy: `/dashboard` e subpáginas (announce/requests/settings) permanecem para compatibilidade, mas sem role de abrigo.
+- Ratings/estrelas removidos do detalhe do pet (não há sistema de avaliação).
+- Modal de adoção removido por instabilidade; substituído por rota dedicada.
 
-## Funcionalidades
+## Tecnologias Utilizadas (do original, permanecem válidas)
+- **Frontend/Full-stack:** Next.js 16 (App Router, RSC), React 19, TypeScript
+- **Estilização:** Tailwind CSS com design kawaii
+- **Componentes UI:** shadcn/ui customizados (button, card, dialog, input, textarea, badge, avatar, skeleton, dropdown-menu, sheet, table, toast, select, etc.)
+- **Forms/Validação:** Zod + React Hook Form (@hookform/resolvers/zod)
+- **Data fetching/cache:** TanStack Query (React Query)
+- **Helpers:** clsx + tailwind-merge (cn)
+- **Backend/Serviços:** Next.js + Supabase SDKs (@supabase/supabase-js, @supabase/ssr)
+- **Auth:** Supabase Auth (RLS); role padrão `adopter` no fluxo atual
+- **DB:** PostgreSQL (Supabase) — tabelas users, pets, adoption_requests
+- **Storage:** Supabase Storage para fotos
+- **Realtime:** Supabase Realtime
+- **Ícones:** Lucide React
+- **Deploy alvo:** Vercel (edge runtime)
 
-### MVP Features
-- **Páginas públicas**: Home com busca/filtros de pets disponíveis (espécie, porte, idade, cidade), grid de cards de pets com fotos e detalhes
-- **Página de detalhe do pet**: Galeria de fotos, descrição, botão para solicitar adoção
-- **Formulário de adoção**: Envia solicitação ao abrigo com dados do adotante
-- **Dashboard do abrigo** (protegido): Gerenciar pets (adicionar, editar, deletar), ver e aprovar/rejeitar solicitações de adoção
-- **Autenticação**: Multi-role (adotante, abrigo/shelter, admin opcional)
-- **Outros**: Realtime updates (ex.: nova solicitação aparece no dashboard), upload de múltiplas fotos, PWA (instalável no celular), notificações básicas (toast de sucesso/erro)
-
-## Tecnologias Utilizadas
-
-### Stack Principal
-- **Frontend e Full-Stack Framework**: Next.js 16 (App Router, React Server Components, Server Actions para forms e mutações)
-- **Biblioteca base**: React 19
-- **Tipagem**: TypeScript
-- **Estilização**: Tailwind CSS com design kawaii
-- **Componentes UI**: shadcn/ui customizados (button, card, dialog, input, textarea, badge, avatar, skeleton, dropdown-menu, sheet, table, toast)
-- **Validação e Forms**: Zod + React Hook Form (@hookform/resolvers/zod)
-- **Fetching e Caching**: TanStack Query (React Query)
-- **Helpers**: clsx + tailwind-merge (cn function para classes)
-- **Backend e Serviços**: Next.js server-side + Supabase SDKs (@supabase/supabase-js e @supabase/ssr para SSR)
-- **Autenticação**: Supabase Auth (com Row Level Security - RLS para multi-role)
-- **Banco de Dados**: PostgreSQL (via Supabase, relacional para tabelas como pets, adoption_requests, users)
-- **Storage**: Supabase Storage (upload e gerenciamento de fotos de pets)
-- **Realtime**: Supabase Realtime (subscriptions para updates em tempo real)
-- **Ícones**: Lucide React
-- **Deploy**: Vercel (1-click, edge runtime, integração nativa com Supabase)
-
-## Estrutura de Pastas
-
+## Estrutura de Pastas (atual)
 ```
 src/
 ├── app/
-│   ├── (auth)/
-│   │   ├── login/
-│   │   ├── signup/
-│   │   └── layout.tsx
-│   ├── (dashboard)/
-│   │   ├── settings/
-│   │   ├── announce-pet/
-│   │   ├── my-pets/          # Renomeado de pets/
-│   │   ├── requests/
-│   │   ├── page.tsx
-│   │   └── layout.tsx
+│   ├── (auth)/{login, signup, layout.tsx}
+│   ├── (dashboard)/{announce-pet, requests, settings, page.tsx, layout.tsx}
 │   ├── (public)/
-│   │   ├── pets/[id]/
-│   │   ├── addpet/           # Nova página pública
-│   │   ├── shelters/         # Nova página pública
-│   │   ├── account-settings/ # Nova página pública
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── logout/
+│   │   └── pets/
+│   │       ├── [id]/page.tsx
+│   │       └── [id]/adopt/page.tsx    # fluxo de adoção em página
+│   ├── my-pets/
+│   │   ├── page.tsx
+│   │   └── [id]/edit/page.tsx
+│   ├── addpet/page.tsx
+│   ├── account-settings/page.tsx
+│   ├── logout/page.tsx
 │   ├── layout.tsx
 │   └── page.tsx
-├── components/
-│   └── ui/
+├── components/ui
 ├── lib/
-│   ├── auth/
-│   ├── supabase/
-│   └── utils.ts
+│   └── auth/provider.tsx
+├── services/{petService.ts, adoptionService.ts}
 ├── types/
-└── services/
-    ├── petService.ts
-    └── adoptionService.ts
+└── ...
 ```
 
-## Dependências Necessárias
+## Serviços principais
+- `petService.ts`: CRUD de pets. **Compatibilidade:** ainda usa coluna `shelter_id` no DB, aliada como `user_id` no código. Ao migrar o schema, criar `user_id`, copiar dados e usar `user_id` direto, removendo `shelter_id`.
+- `adoptionService.ts`: criação/listagem/atualização de solicitações de adoção.
+- `lib/auth/provider.tsx`: AuthContext simplificado, role padrão `adopter` (sem shelter/admin no fluxo atual).
 
-### Dependências Principais
-```bash
-npm install next@16.1.6 react@19.2.3 react-dom@19.2.3 @supabase/supabase-js@^2.48.1 @supabase/ssr@^0.5.2 @tanstack/react-query@^5.66.0 zod@^3.24.1 @hookform/resolvers@^3.10.0 clsx@^2.1.1 tailwind-merge@^3.4.0 sonner@^1.7.4 react-hook-form@^7.54.2 class-variance-authority@^0.7.1 lucide-react@^0.563.0 radix-ui@^1.4.3
+## Dependências (originais, válidas)
+Principais:
+```
+npm install next@16.1.6 react@19.2.3 react-dom@19.2.3 \
+  @supabase/supabase-js@^2.48.1 @supabase/ssr@^0.5.2 \
+  @tanstack/react-query@^5.66.0 zod@^3.24.1 \
+  @hookform/resolvers@^3.10.0 clsx@^2.1.1 tailwind-merge@^3.4.0 \
+  sonner@^1.7.4 react-hook-form@^7.54.2 \
+  class-variance-authority@^0.7.1 lucide-react@^0.563.0 radix-ui@^1.4.3
+```
+Dev:
+```
+npm install -D @tailwindcss/postcss@^4 @types/node@^20 @types/react@^19 \
+  @types/react-dom@^19 eslint@^9 eslint-config-next@16.1.6 \
+  shadcn-ui@^0.2.3 tailwindcss@^4 typescript@^5 tw-animate-css@^1.4.0
 ```
 
-### Dependências de Desenvolvimento
-```bash
-npm install -D @tailwindcss/postcss@^4 @types/node@^20 @types/react@^19 @types/react-dom@^19 eslint@^9 eslint-config-next@16.1.6 shadcn-ui@^0.2.3 tailwindcss@^4 typescript@^5 tw-animate-css@^1.4.0
+## Variáveis de ambiente
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-## Configurações Necessárias
+## Scripts
+- `npm run dev` — desenvolvimento
+- `npm run build` — build de produção
+- `npm run start` — produção
+- `npm run lint` — lint
 
-### Variáveis de Ambiente (.env.local)
-```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
-
-### Configurações do Supabase
-Você precisará criar uma conta no Supabase e configurar:
-- Tabelas para usuários, pets e solicitações de adoção
-- Configurações de autenticação
-- Políticas de segurança (RLS)
-- Storage para imagens de pets
-
-### Configuração do shadcn/ui
-O projeto já está configurado com os componentes shadcn/ui:
-- button
-- card
-- input
-- label
-- textarea
-- dialog
-- badge
-- avatar
-- skeleton
-- dropdown-menu
-- sheet
-- table
-- separator
-- toast
-- select
-
-## Scripts Disponíveis
-
-- `npm run dev`: Inicia o servidor de desenvolvimento
-- `npm run build`: Cria uma build de produção
-- `npm run start`: Inicia o servidor de produção
-- `npm run lint`: Executa o linter
-
-## Como Executar o Projeto
-
-1. Clone o repositório
-2. Instale as dependências:
+## Execução
 ```bash
 npm install
-```
-3. Configure as variáveis de ambiente no arquivo `.env.local`
-4. Inicie o servidor de desenvolvimento:
-```bash
 npm run dev
+# acessar http://localhost:3000 (ou porta alternativa se outro dev estiver rodando)
 ```
-5. Acesse http://localhost:3000 no seu navegador
 
-## Funcionalidades Implementadas (95% completo)
+## Migração de schema recomendada
+- Hoje: `pets.shelter_id` é usado como alias `user_id`.
+- Migrar: adicionar `user_id` em `pets`, copiar dados de `shelter_id`, ajustar `petService` para usar `user_id`, remover `shelter_id`.
 
-### Arquitetura & Infraestrutura (100% completo)
-- Stack Tecnológica: Next.js 16 (App Router), TypeScript, Tailwind CSS, Supabase
-- Estrutura de Pastas: Organizada conforme especificações
-- Configurações: Middleware, tsconfig, .env.local, next.config, etc.
-- Banco de Dados: Tabelas criadas no Supabase (users, pets, adoption_requests)
-- Storage: Configurado para upload de fotos no Supabase Storage
-- Deployment: Configurado para Vercel (edge runtime, integração nativa com Supabase)
+## Remoção da funcionalidade abrigo e outros extras
+- Removidos: roles/flows de abrigos, página de shelters, rating/estrelas de pet, modal de adoção.
+- Adicionados: fluxo de adoção em página `/pets/[id]/adopt`, header enxuto, Meus Pets como rota pública, alias `shelter_id`→`user_id` para compatibilidade.
 
-### Autenticação & Autorização (100% completo)
-- Sistema de Login/Signup: Completo e funcional
-- Controle de Roles: adopter, shelter, admin (com proteção adequada)
-- Proteção de Rotas: Baseada em papéis de usuário
-- Contexto de Autenticação: React Context implementado e otimizado
-- Integração Supabase Auth: Com tratamento de erros e recuperação automática
-- Políticas RLS: Configuradas para segurança de dados
-- Correção de loop infinito no login/cadastro
-- Redirecionamento pós-login para página de pets
+## Próximos passos sugeridos
+- Migrar schema para `user_id` definitivo.
+- Opcional: campo “histórico/condição do resgate” e flag “urgente”.
+- Validar contato do anunciante (email/telefone) para dar confiança.
+- Testes manuais nos fluxos `/pets/[id]/adopt`, `/my-pets`, `/addpet` pós-migração.
+- Avaliar remover/ocultar dashboard legacy ou adaptá-lo ao P2P.
 
-### CRUD Completo de Pets (100% completo)
-- Criar Pet: Página `/dashboard/announce-pet` com formulário completo
-- Ler/Listar Pets: Página `/dashboard/my-pets` com listagem completa
-- Atualizar Pet: Página `/dashboard/my-pets/[id]/edit` com edição completa
-- Deletar Pet: Com confirmação e tratamento de erro
-- Upload de Fotos: Com pré-visualização e upload real para Supabase Storage
-- Controle de Status: disponível, reservado, adotado (com interface visual)
-- Validações: Formulário completo com Zod + React Hook Form
-- Feedback Visual: Toasts e mensagens de sucesso/erro
-
-### Sistema de Adoção (100% completo)
-- **Formulário de Solicitação**: Modal integrado à página de detalhes do pet
-- **Backend Completo**: Serviço `adoptionService.ts` com CRUD completo
-- **Dashboard de Solicitações**: Página `/dashboard/requests` para gerenciamento
-- **Aprovação/Rejeição**: Interface completa para abrigos gerenciarem solicitações
-- **Integração com Banco**: Tabela `adoption_requests` com relacionamentos adequados
-- **Fluxo Completo**: Adotante solicita → Abrigo aprova/rejeita → Status atualizado
-
-### Frontend & UX/UI (100% completo)
-- Design Kawaii: Implementado com paleta rosa-laranja
-- Responsividade: Funciona em desktop e mobile
-- Animações: Transições e efeitos visuais (bounce, float, hover effects)
-- PWA: Configurado e instalável
-- Componentes UI: shadcn/ui customizados com estilo kawaii
-- Cards Decorativos: Com design arredondado e sombras suaves
-- Botões Gradientes: Com efeitos hover e estilo rosa-laranja
-- Elementos Visuais: Gatinhos (🐱), patinhas (🐾), corações (💕)
-
-### Páginas Públicas (100% completo)
-- Home Page: Com busca e listagem de pets disponíveis
-- Página de Detalhe do Pet: Visualização completa com galeria de fotos
-- Página de Anúncio de Pet: `/addpet` (pública)
-- Página de Abrigos: `/shelters` com listagem de parceiros
-- Página de Configurações de Conta: `/account-settings`
-- Barra de Pesquisa: Funcional no header público
-- Confirmação de Logout: Modal com "Sim/Não" para deslogar
-- Layouts Organizados: (auth), (dashboard), (public) com proteção adequada
-- Elementos Decorativos: Coerentes com o design kawaii
-
-### Serviços Backend (100% completo)
-- petService.ts: Com todas as operações CRUD
-- adoptionService.ts: Serviço completo para solicitações de adoção
-- Integração Supabase: Client-side fully configured
-- Upload de Fotos: Funcional com tratamento de múltiplas imagens
-- Tipagem TypeScript: Completa com interfaces bem definidas
-- Tratamento de Erros: Robusto em todas as operações
-- Cache & Optimistic Updates: Configurações básicas implementadas
-
-### Segurança & Performance (100% completo)
-- Row Level Security: Configurado para todas as tabelas
-- Proteção de Storage: Restrições adequadas no Supabase Storage
-- Validação de Dados: Frontend e backend com Zod
-- Sanitização de Inputs: Implementada para prevenção de XSS
-- Carregamento Otimizado: Imagens com lazy loading
-- Proteção contra Loops: Correção de problemas de estado de autenticação
-
-## Funcionalidades Pendentes (5% restante)
-
-### Recursos Avançados (20% completo)
-- Sistema de Mensagens: Entre adotantes e abrigos
-- Integração com Mapas: Para localização de abrigos
-- Sistema de Avaliações: Após adoção ser completada
-- Filtros Avançados: Busca refinada na home page (raça, vacinação, etc.)
-
-### Notificações & Realtime (0% completo)
-- Sistema de Notificações: Toasts para eventos importantes
-- Updates em Tempo Real: Com Supabase Realtime
-- Alertas para Abrigos: Quando nova solicitação chega
-- Notificações Push: Opcionais para atualizações importantes
-
-### Qualidade & Documentação (0% completo)
-- Testes Unitários: Para componentes e serviços
-- Testes de Integração: Para fluxos completos
-- Testes End-to-End: Para validação de funcionalidades
-- Documentação Técnica: Frontend, backend, deploy
-- Guia de Contribuição: Para outros desenvolvedores
-- Documentação de API: Para futuras integrações
-
-### Aperfeiçoamentos Finais (40% completo)
-- Performance: Otimizações de cache e loading (Skeletons, SWR)
-- SEO: Meta tags e otimizações para motores de busca
-- Acessibilidade: Melhorias para usuários com deficiência
-- Tratamento de Erros: Mais robusto em todas as operações
-- Internationalização: Suporte a múltiplos idiomas
-- Analytics: Integração para métricas de uso
-
-### Segurança Adicional (30% completo)
-- Rate Limiting: Para proteger contra ataques de força bruta
-- Auditoria de Ações: Log de operações importantes
-- Validação de Imagens: Antes do upload para evitar malwares
-- Política de Senhas: Requisitos de segurança mais rigorosos
-
-## Próximos Passos para 100% Completo
-
-### Recursos Avançados (80% restante)
-1. Implementar sistema de mensagens entre adotantes e abrigos
-2. Adicionar integração com mapas para localização de abrigos
-3. Implementar sistema de avaliações pós-adoção
-4. Adicionar filtros avançados na página de busca
-
-### Qualidade e Documentação (25% restante)
-1. Escrever testes unitários e de integração
-2. Criar documentação técnica completa
-3. Implementar sistema de logging
-4. Fazer revisão de segurança
-
-### Ajustes Finais (15% restante)
-1. Otimizações de performance
-2. Ajustes de acessibilidade
-3. Testes finais de usabilidade
-4. Preparação para produção
-
-## Contribuição
-
-Sinta-se à vontade para contribuir com este projeto. Basta fazer um fork, criar uma branch com sua feature e enviar um pull request.
-
-## Conclusão
-
-O projeto Kitty está em um estado excepcionalmente avançado, com todas as funcionalidades principais já implementadas e operacionais. A base está extremamente sólida e funcional, com um design encantador e uma arquitetura bem estruturada.
-
-O CRUD completo do dashboard está 100% funcional, permitindo que abrigos gerenciem seus pets com total eficiência. O sistema de autenticação está robusto e seguro, com controle de acesso baseado em papéis.
-
-O sistema de adoção está completamente implementado, desde a solicitação na página do pet até o gerenciamento no dashboard do abrigo. As páginas públicas de anúncio, abrigos e configurações estão todas completas e integradas com o design kawaii.
-
-O projeto está praticamente pronto para uso em produção para as funcionalidades principais. As funcionalidades pendentes são principalmente recursos avançados que incrementariam ainda mais a experiência do usuário, mas não são críticas para o funcionamento do sistema.
+## Observações finais
+- Adoção direta entre usuários (P2P), sem burocracia e sem abrigos no fluxo principal.
+- Modal de adoção substituído por página para evitar problemas de posicionamento.
+- Design kawaii mantido, responsivo, com shadcn/ui.
